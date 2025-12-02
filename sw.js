@@ -4,9 +4,7 @@ const FILES_TO_CACHE = [
   './index.html',
   './style.css',
   './game.js',
-  './manifest.json',
-  './icons/icon-192.png',
-  './icons/icon-512.png'
+  './manifest.json'
 ];
 
 // Install: cache all files
