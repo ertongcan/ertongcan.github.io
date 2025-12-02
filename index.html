@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reach the Target</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0288d1">
+<link rel="stylesheet" href="style.css">
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js')
+    .then(() => console.log('Service Worker registered'))
+    .catch(err => console.log('SW registration failed:', err));
+}
+</script>
+</head>
+<body>
+<div class="game-container">
+
+  <!-- Game UI wrapper -->
+  <div id="game-ui">
+    <!-- Target & Current -->
+    <div class="status">
+      <div class="status-item">
+        <span class="label">Target:</span>
+        <span id="target-number" class="number">0</span>
+      </div>
+      <div class="status-item">
+        <span class="label">Current:</span>
+        <span id="current-number" class="number">0</span>
+      </div>
+    </div>
+
+    <!-- Moves & Score -->
+    <div class="status">
+      <div class="status-item">
+        <span class="label">Moves left: </span>
+        <span id="moves-left">0</span>
+      </div>
+      <div class="status-item">
+        <span class="label">Score: </span>
+        <span id="score">0</span>
+      </div>
+      <div class="status-item">
+        <span class="label">All Time High: </span>
+        <span id="high-score">0</span>
+      </div>
+    </div>
+
+    <!-- Operation buttons -->
+    <div class="buttons" id="operation-buttons">
+      <button id="left-btn"></button>
+      <button id="right-btn"></button>
+    </div>
+  </div>
+
+  <!-- Feedback -->
+  <div id="feedback" class="feedback"></div>
+
+  <!-- Retry button -->
+  <button id="retry-btn" style="display:none;">New Game</button>
+
+</div>
+
+
+<script src="game.js"></script>
+</body>
+</html>
