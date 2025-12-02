@@ -1,22 +1,44 @@
-/* Make numbers prominent */
-.number {
-  font-size: 2.2rem;
-  font-weight: bold;
-  color: #0288d1;
-  margin-left: 0.5em;
-}
-
-/* Status items spacing and alignment */
-.status {
+.status-center {
   display: flex;
-  justify-content: space-between;
-  gap: 1.5rem;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1.2rem; /* space between Target and Current */
   margin-bottom: 0.7rem;
 }
+
 .status-item {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0.3em;
+  gap: 0.2em; /* space between number and label */
+}
+
+.target-number,
+.current-number {
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: #0288d1;
+}
+
+.target-label,
+.current-label {
+  font-size: 1rem;
+  color: #444;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.current-item .label {
+  font-size: 0.9rem;
+  color: #444;
+  margin-bottom: 0.1em;
+}
+
+.current-number {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #0288d1;
 }
 
 /* Feedback improvements */
@@ -108,4 +130,52 @@
 .retry-btn:active {
   background: #01579b;
   transform: scale(1.05);
+}
+
+.game-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.game-header h1 {
+  font-size: 2.3rem;
+  font-weight: 700;
+  color: #0288d1;
+  letter-spacing: 0.03em;
+  margin: 0;
+  padding: 0.7em 0 0.3em 0;
+  text-shadow: 0 2px 8px rgba(2,136,209,0.07);
+}
+
+.status-secondary {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.7rem;
+}
+
+/* style.css */
+.level-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.2rem;
+  gap: 0.2em;
+}
+
+.level-label {
+  font-size: 1rem;
+  color: #444;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.level-number {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: #d32f2f;
+  margin-top: 0.1em;
+  letter-spacing: 0.03em;
 }

@@ -19,34 +19,32 @@ if ('serviceWorker' in navigator) {
 </head>
 <body>
 <div class="game-container">
-
+  <header class="game-header">
+    <h1>Target Tap v0.1</h1>
+  </header>
+  <div class="level-row">
+    <span class="level-label">Level</span>
+    <span id="score" class="level-number">0</span>
+  </div>
   <!-- Game UI wrapper -->
   <div id="game-ui">
     <!-- Target & Current -->
-    <div class="status">
-      <div class="status-item">
-        <span class="label">Target:</span>
-        <span id="target-number" class="number">0</span>
+    <div class="status status-center">
+      <div class="status-item target-item">
+        <span class="label">Target</span>
+        <span id="target-number" class="number target-number">0</span>
       </div>
-      <div class="status-item">
-        <span class="label">Current:</span>
-        <span id="current-number" class="number">0</span>
+      <div class="status-item current-item">
+        <span class="label">Current</span>
+        <span id="current-number" class="number current-number">0</span>
       </div>
     </div>
 
     <!-- Moves & Score -->
-    <div class="status">
+    <div class="status status-secondary">
       <div class="status-item">
         <span class="label">Moves left: </span>
         <span id="moves-left">0</span>
-      </div>
-      <div class="status-item">
-        <span class="label">Level: </span>
-        <span id="score">0</span>
-      </div>
-      <div class="status-item">
-        <span class="label">All Time High: </span>
-        <span id="high-score">0</span>
       </div>
     </div>
 
@@ -54,6 +52,11 @@ if ('serviceWorker' in navigator) {
     <div class="buttons" id="operation-buttons">
       <button id="left-btn"></button>
       <button id="right-btn"></button>
+    </div>
+    <!-- All Time High below buttons -->
+    <div class="high-score-row">
+      <span class="label">All Time High: </span>
+      <span id="high-score">0</span>
     </div>
   </div>
 
