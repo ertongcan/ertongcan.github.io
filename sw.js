@@ -1,4 +1,4 @@
-const CACHE_NAME = 'target-math-cache-v0.1.1'; // Increment version when you update
+const CACHE_NAME = 'target-math-cache-v0.1.2'; // Increment version when you update
 const FILES_TO_CACHE = [
   './',
   './index.html',
@@ -12,6 +12,7 @@ self.addEventListener('install', evt => {
   evt.waitUntil(
     caches.open(CACHE_NAME).then(cache => cache.addAll(FILES_TO_CACHE))
   );
+  console.log("v0.1.2");
   self.skipWaiting();
 });
 
