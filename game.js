@@ -2,6 +2,8 @@ let currentNumber = 1;
 let score = 0;
 let movesLeft;
 let running = true;
+// Initialize game
+let targetNumber = 7;
 
 const operations = ["+", "-", "×", "÷"];
 
@@ -16,6 +18,8 @@ const rightBtn = document.getElementById('right-btn');
 retryBtn.style.display = "none";
 document.querySelector('.game-container').appendChild(retryBtn);*/
 const retryBtn = document.getElementById('retry-btn');
+const cntBtn = document.getElementById('cnt-btn');
+const watchAdCntBtn = document.getElementById('watch-ad-continue');
 const scoreEl = document.getElementById('score') || createScoreElement();
 let highScore = parseInt(localStorage.getItem('highScore')) || 0;
 const highScoreEl = document.getElementById('high-score') || createHighScoreElement();
@@ -79,8 +83,7 @@ function updateHighScore() {
   }
 }
 
-// Initialize game
-let targetNumber = 5;
+
 function startRound() {
   if (!running) return;
   currentNumber = Math.floor(Math.random() * 13) + 1;
@@ -106,13 +109,16 @@ function checkEnd() {
     updateHighScore();
     targetNumber = Math.floor(Math.random() * 13) + 1;
     showFeedback(`✅ Success! Next target: ${targetNumber}`);
+    cntBtn.style.display = "block";
+    document.getElementById('game-ui').style.display = "none";
+
     startRound();
   } else if (movesLeft <= 0) {
     running = false;
     showFeedback(`❌ Sorry! No more moves left!`);
     retryBtn.style.display = "block";              // Show retry
-    document.getElementById('game-ui').style.display = "none"; // Hide entire game UI
-    updateHighScore();
+    watchAdCntBtn.style.display = "block";              // Show retry
+    document.getElementById('game-ui').style.display = "none";
   }
 }
 
@@ -123,6 +129,15 @@ retryBtn.addEventListener('click', () => {
   running = true;
   document.getElementById('game-ui').style.display = "block"; // Show UI again
   retryBtn.style.display = "none";                             // Hide retry until next fail
+  watchAdCntBtn.style.display = "none";                             // Hide retry until next fail
+  feedbackEl.textContent = "";
+  startRound();
+});
+
+cntBtn.addEventListener('click', () => {
+  running = true;
+  document.getElementById('game-ui').style.display = "block"; // Show UI again
+  cntBtn.style.display = "none";                             // Hide retry until next fail
   feedbackEl.textContent = "";
   startRound();
 });
@@ -139,6 +154,43 @@ function handleClick(btnOp) {
 
 leftBtn.addEventListener('click', () => handleClick(leftOp));
 rightBtn.addEventListener('click', () => handleClick(rightOp));
+
+const moreTapsBtn = document.getElementById("watch-ad-btn");
+
+moreTapsBtn.addEventListener("click", () => {
+  // 1️⃣ Add 7 moves
+  movesLeft += 7;
+  document.getElementById("moves-left").textContent = movesLeft;
+
+  // 2️⃣ Only inject AdSense once
+  if (!window.adsenseLoaded) {
+    window.adsenseLoaded = true;
+
+    const script = document.createElement("script");
+    script.async = true;
+    script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1433248445674721";
+    script.crossOrigin = "anonymous";
+
+    // Append it to the <head> or container
+    document.head.appendChild(script);
+    // Create the <ins> container
+    const ad = document.createElement("ins");
+    ad.className = "adsbygoogle";
+    ad.style.display = "block";
+    ad.style.width = "100%";       // important!
+    ad.style.height = "90px";      // or any reasonable height
+    ad.setAttribute("data-ad-client", "ca-pub-1433248445674721");
+    ad.setAttribute("data-ad-slot", "2462514365");
+    ad.setAttribute("data-ad-format", "auto");
+    ad.setAttribute("data-full-width-responsive", "true");
+
+    document.getElementById("adsense-container").appendChild(ad);
+
+    // Load the script
+    (adsbygoogle = window.adsbygoogle || []).push({});
+  }
+
+});
 
 // Start first round
 startRound();

@@ -16,7 +16,7 @@
 
 .target-number,
 .current-number {
-  font-size: 1.7rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: #0288d1;
 }
@@ -30,13 +30,13 @@
 }
 
 .current-item .label {
-  font-size: 0.9rem;
+  font-size: 1rem;
   color: #444;
   margin-bottom: 0.1em;
 }
 
 .current-number {
-  font-size: 1.2rem;
+  font-size: 1.5rem;
   font-weight: bold;
   color: #0288d1;
 }
@@ -111,6 +111,22 @@
   }
 }
 
+.cnt-btn {
+  display: block;
+  margin: 2rem auto 0 auto;
+  min-width: 160px;
+  padding: 1.2em 2.5em;
+  font-size: 1.5rem;
+  border-radius: 14px;
+  border: none;
+  background: #0288d1;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  transition: background 0.2s, transform 0.2s;
+  cursor: pointer;
+  text-align: center;
+}
+
 .retry-btn {
   display: block;
   margin: 2rem auto 0 auto;
@@ -132,20 +148,37 @@
   transform: scale(1.05);
 }
 
+.cnt-btn:active {
+  background: #01579b;
+  transform: scale(1.05);
+}
+
 .game-header {
-  text-align: center;
-  margin-bottom: 2rem;
+  width: 100%;
+  padding: 0.9rem 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+
+  background: #ffffff;
+  border-bottom: 1px solid #eee;   /* subtle mobile divider */
 }
 
 .game-header h1 {
-  font-size: 2.3rem;
+  font-size: 1.2rem;              /* mobile scale */
   font-weight: 700;
   color: #0288d1;
-  letter-spacing: 0.03em;
   margin: 0;
-  padding: 0.7em 0 0.3em 0;
-  text-shadow: 0 2px 8px rgba(2,136,209,0.07);
+  letter-spacing: 0.02em;
 }
+
+/* Even smaller for extra-small screens */
+@media (max-width: 400px) {
+  .game-header h1 {
+    font-size: 1.05rem;
+  }
+}
+
 
 .status-secondary {
   display: flex;
@@ -162,6 +195,7 @@
   align-items: center;
   justify-content: center;
   margin-bottom: 1.2rem;
+  margin-top: 30px;
   gap: 0.2em;
 }
 
@@ -179,3 +213,89 @@
   margin-top: 0.1em;
   letter-spacing: 0.03em;
 }
+
+/* Clean, centered, bold Level bar */
+.level-bar {
+  width: 100%;
+  padding: 14px 0;
+  background: #ffffff;
+  border-radius: 12px;
+  margin: 22px auto 0;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #222;
+
+  box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+
+  max-width: 380px; /* keeps it centered and neat on large screens */
+}
+
+/* Subtle label style */
+.level-bar .level-label {
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+/* Highlighted level number */
+.level-bar .level-value {
+  color: #0288d1;
+  font-weight: 800;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 480px) {
+  .level-bar {
+    font-size: 1.5rem;
+    padding: 12px 0;
+    max-width: 90%;
+  }
+}
+
+.watch-ad-btn {
+  padding: 0.15em 0.55em;
+  font-size: 0.75rem;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+  background: #f8f8f8;
+  color: #555;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.watch-ad-btn:hover {
+  background: #e7e7e7;
+  color: #333;
+}
+
+.watch-ad-btn:active {
+  transform: scale(0.96);
+}
+
+.watch-ad-minimal {
+  padding: 0.45em 1.2em;
+  font-size: 0.9rem;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+  background: #f8f8f8;
+  color: #555;
+  cursor: pointer;
+  margin: 1rem auto 0 auto;
+  display: block;
+  transition: background 0.15s, color 0.15s;
+}
+
+.watch-ad-minimal:hover {
+  background: #e7e7e7;
+  color: #333;
+}
+
+.watch-ad-minimal:active {
+  transform: scale(0.96);
+}
+
