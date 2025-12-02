@@ -1,4 +1,4 @@
-const CACHE_NAME = 'target-math-cache-v0.1.0'; // Increment version when you update
+const CACHE_NAME = 'target-math-cache-v0.1.1'; // Increment version when you update
 const FILES_TO_CACHE = [
   './',
   './index.html',

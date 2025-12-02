@@ -1,77 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="google-adsense-account" content="ca-pub-1433248445674721">
-<title>Reach the Target</title>
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0288d1">
-<link rel="stylesheet" href="style.css">
-<script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js')
-    .then(() => console.log('Service Worker registered'))
-    .catch(err => console.log('SW registration failed:', err));
 
-  console.log("v0.1.0");
-}
-</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-adsense-account" content="ca-pub-1433248445674721">
+    <title>Reach the Target</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0288d1">
+    <link rel="stylesheet" href="style.css">
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(() => console.log('Service Worker registered'))
+                .catch(err => console.log('SW registration failed:', err));
+
+            console.log("v0.1.1");
+        }
+    </script>
 </head>
 <body>
 <div class="game-container">
-  <header class="game-header">
-    <h1>Target Tap v0.1.0</h1>
-  </header>
-  <div class="level-row">
-    <span class="level-label">Score</span>
-    <span id="score" class="level-number">0</span>
-  </div>
-  <!-- Game UI wrapper -->
-  <div id="game-ui">
-    <!-- Target & Current -->
-    <div class="status status-center">
-      <div class="status-item target-item">
-        <span class="label">Target</span>
-        <span id="target-number" class="number target-number">0</span>
-      </div>
-      <div class="status-item current-item">
-        <span class="label">Current</span>
-        <span id="current-number" class="number current-number">0</span>
-      </div>
+    <header class="game-header">
+        <h1>Target Tap v0.1.0</h1>
+    </header>
+    <div class="level-row">
+        <span class="level-label">Score</span>
+        <span id="score" class="level-number">0</span>
+    </div>
+    <!-- Game UI wrapper -->
+    <div id="game-ui">
+        <!-- Target & Current -->
+        <div class="status status-center">
+            <div class="status-item target-item">
+                <span class="label">Target</span>
+                <span id="target-number" class="number target-number">0</span>
+            </div>
+            <div class="status-item current-item">
+                <span class="label">Current</span>
+                <span id="current-number" class="number current-number">0</span>
+            </div>
+        </div>
+
+        <!-- Moves & Score -->
+        <div class="status status-secondary">
+            <div class="status-item">
+                <span class="label">Remaining Taps </span>
+                <span id="moves-left">0</span>
+            </div>
+            <button id="watch-ad-btn" class="watch-ad-btn">+ More Taps</button>
+            <div id="adsense-container"></div>
+        </div>
+
+        <!-- Operation buttons -->
+        <div class="buttons" id="operation-buttons">
+            <button id="left-btn"></button>
+            <button id="right-btn"></button>
+        </div>
+        <!-- All Time High below buttons -->
+        <div class="level-bar">
+            <span class="level-label">Level</span>
+            <span id="high-score" class="level-value">0</span>
+        </div>
     </div>
 
-    <!-- Moves & Score -->
-    <div class="status status-secondary">
-      <div class="status-item">
-        <span class="label">Remaining Taps </span>
-        <span id="moves-left">0</span>
-      </div>
-      <button id="watch-ad-btn" class="watch-ad-btn">+ More Taps</button>
-      <div id="adsense-container"></div>
-    </div>
+    <!-- Feedback -->
+    <div id="feedback" class="feedback"></div>
 
-    <!-- Operation buttons -->
-    <div class="buttons" id="operation-buttons">
-      <button id="left-btn"></button>
-      <button id="right-btn"></button>
-    </div>
-    <!-- All Time High below buttons -->
-    <div class="level-bar">
-      <span class="level-label">Level</span>
-      <span id="high-score" class="level-value">0</span>
-    </div>
-  </div>
-
-  <!-- Feedback -->
-  <div id="feedback" class="feedback"></div>
-
-  <!-- Retry button -->
-  <button id="retry-btn" class="retry-btn" style="display:none;">New Game</button>
-  <button id="cnt-btn" class="cnt-btn" style="display:none;">Continue</button>
-  <button id="watch-ad-continue" class="watch-ad-minimal" style="display:none;">
-    Watch Ad to Continue
-  </button>
+    <!-- Retry button -->
+    <button id="retry-btn" class="retry-btn" style="display:none;">New Game</button>
+    <button id="cnt-btn" class="cnt-btn" style="display:none;">Continue</button>
+    <button id="watch-ad-continue" class="watch-ad-minimal" style="display:none;">
+        Watch Ad to Continue
+    </button>
 
 </div>
 
