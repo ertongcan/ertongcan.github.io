@@ -1,0 +1,6 @@
+{
+  "appId": "com.ertong.targetap",
+  "appName": "target-tap",
+  "webDir": "www",
+  "bundledWebRuntime": true
+}

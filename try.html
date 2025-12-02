@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Lumen-Scan PoC</title>
+    <style>
+        body { margin: 0; background: #000; color: #fff; font-family: monospace; overflow: hidden; }
+        #video-container { position: relative; width: 100vw; height: 100vh; }
+        video, canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+        canvas { z-index: 2; pointer-events: none; mix-blend-mode: screen; }
+        
+        .ui-overlay {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            z-index: 10;
+            width: 80%;
+        }
+
+        .meter-value { font-size: 4rem; font-weight: bold; color: #00ff88; }
+        .label { font-size: 0.7rem; letter-spacing: 3px; opacity: 0.7; text-transform: uppercase; }
+        
+        #start-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px 40px;
+            background: #fff;
+            border: none;
+            border-radius: 50px;
+            font-weight: bold;
+            z-index: 100;
+        }
+        .crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 30px;
+            height: 30px;
+            border: 1px solid rgba(255,255,255,0.5);
+            border-radius: 50%;
+            z-index: 5;
+        }
+    </style>
+</head>
+<body>
+
+    <button id="start-btn">OPEN LUMEN-SCAN</button>
+    <div class="crosshair"></div>
+
+    <div id="video-container">
+        <video id="video" autoplay playsinline></video>
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <div class="ui-overlay">
+        <div class="label">Center Exposure</div>
+        <div id="meter" class="meter-value">--</div>
+        <div style="margin-top: 10px; font-size: 0.6rem;">BLUE: SHADOWS | RED: CLIPPING</div>
+    </div>
+
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        const meter = document.getElementById('meter');
+        const startBtn = document.getElementById('start-btn');
+
+        startBtn.addEventListener('click', async () => {
+            startBtn.style.display = 'none';
+            const stream = await navigator.mediaDevices.getUserMedia({ 
+                video: { facingMode: 'environment' } 
+            });
+            video.srcObject = stream;
+            video.onloadedmetadata = () => {
+                canvas.width = video.videoWidth / 4; // Downscale for performance
+                canvas.height = video.videoHeight / 4;
+                processFrame();
+            };
+        });
+
+        function processFrame() {
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = frame.data;
+            let centerLuma = 0;
+            let centerCount = 0;
+
+            for (let i = 0; i < data.length; i += 4) {
+                const r = data[i];
+                const g = data[i + 1];
+                const b = data[i + 2];
+
+                // Standard Luminance calculation
+                const luma = 0.299 * r + 0.587 * g + 0.114 * b;
+
+                // Simple False Color Mapping
+                if (luma > 230) { // Highlights
+                    data[i] = 255; data[i+1] = 0; data[i+2] = 0; data[i+3] = 200;
+                } else if (luma < 30) { // Shadows
+                    data[i] = 0; data[i+1] = 0; data[i+2] = 255; data[i+3] = 150;
+                } else {
+                    // Make rest of image transparent/invisible to see the real video
+                    data[i+3] = 0; 
+                }
+
+                // Track center pixels for the meter
+                const x = (i / 4) % canvas.width;
+                const y = Math.floor((i / 4) / canvas.width);
+                if (x > canvas.width * 0.4 && x < canvas.width * 0.6 && 
+                    y > canvas.height * 0.4 && y < canvas.height * 0.6) {
+                    centerLuma += luma;
+                    centerCount++;
+                }
+            }
+
+            ctx.putImageData(frame, 0, 0);
+            meter.innerText = Math.round((centerLuma / centerCount) / 2.55); // Scale to 0-100
+            
+            requestAnimationFrame(processFrame);
+        }
+    </script>
+</body>
+</html>
