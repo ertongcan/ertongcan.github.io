@@ -17,7 +17,8 @@ self.addEventListener('install', evt => {
 
 // Activate: delete old caches
 self.addEventListener('activate', evt => {
-  evt.waitUntil(
+  console.log("Service Worker activated");
+  /*evt.waitUntil(
     caches.keys().then(keys =>
       Promise.all(
         keys.map(key => {
@@ -26,7 +27,7 @@ self.addEventListener('activate', evt => {
       )
     )
   );
-  self.clients.claim();
+  self.clients.claim();*/
 });
 
 // Fetch: serve cached files, fallback to network
