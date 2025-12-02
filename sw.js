@@ -1,4 +1,4 @@
-const CACHE_NAME = 'target-math-cache-v4'; // Increment version when you update
+const CACHE_NAME = 'target-math-cache-v1'; // Increment version when you update
 const FILES_TO_CACHE = [
   './',
   './index.html',
@@ -27,7 +27,8 @@ self.addEventListener('activate', evt => {
       )
     )
   );
-  self.clients.claim();*/
+  */
+  self.clients.claim();
 });
 
 // Fetch: serve cached files, fallback to network
