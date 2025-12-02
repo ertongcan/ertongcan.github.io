@@ -11,11 +11,11 @@ const movesEl = document.getElementById('moves-left');
 const feedbackEl = document.getElementById('feedback');
 const leftBtn = document.getElementById('left-btn');
 const rightBtn = document.getElementById('right-btn');
-const retryBtn = document.createElement('button'); // Retry button
-retryBtn.textContent = "New Game";
+// const retryBtn = document.createElement('button'); // Retry button
+/*retryBtn.textContent = "New Game";
 retryBtn.style.display = "none";
-document.querySelector('.game-container').appendChild(retryBtn);
-
+document.querySelector('.game-container').appendChild(retryBtn);*/
+const retryBtn = document.getElementById('retry-btn');
 const scoreEl = document.getElementById('score') || createScoreElement();
 let highScore = parseInt(localStorage.getItem('highScore')) || 0;
 const highScoreEl = document.getElementById('high-score') || createHighScoreElement();
