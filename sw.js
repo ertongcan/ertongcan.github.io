@@ -1,4 +1,4 @@
-const CACHE_NAME = 'target-math-cache-v1'; // Increment version when you update
+const CACHE_NAME = 'target-math-cache-v0'; // Increment version when you update
 const FILES_TO_CACHE = [
   './',
   './index.html',
@@ -18,7 +18,7 @@ self.addEventListener('install', evt => {
 // Activate: delete old caches
 self.addEventListener('activate', evt => {
   console.log("Service Worker activated");
-  /*evt.waitUntil(
+  evt.waitUntil(
     caches.keys().then(keys =>
       Promise.all(
         keys.map(key => {
@@ -27,7 +27,7 @@ self.addEventListener('activate', evt => {
       )
     )
   );
-  */
+
   self.clients.claim();
 });
 
