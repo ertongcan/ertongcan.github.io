@@ -5,6 +5,7 @@ let running = true;
 // Initialize game
 let targetNumber = 7;
 
+
 const operations = ["+", "-", "×", "÷"];
 
 const currentEl = document.getElementById('current-number');
@@ -158,37 +159,16 @@ rightBtn.addEventListener('click', () => handleClick(rightOp));
 const moreTapsBtn = document.getElementById("watch-ad-btn");
 
 moreTapsBtn.addEventListener("click", () => {
-  // 1️⃣ Add 7 moves
-  movesLeft += 7;
-  document.getElementById("moves-left").textContent = movesLeft;
-
-  // 2️⃣ Only inject AdSense once
-  if (!window.adsenseLoaded) {
-    window.adsenseLoaded = true;
-
-    const script = document.createElement("script");
-    script.async = true;
-    script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1433248445674721";
-    script.crossOrigin = "anonymous";
-
-    // Append it to the <head> or container
-    document.head.appendChild(script);
-    // Create the <ins> container
-    const ad = document.createElement("ins");
-    ad.className = "adsbygoogle";
-    ad.style.display = "block";
-    ad.style.width = "100%";       // important!
-    ad.style.height = "90px";      // or any reasonable height
-    ad.setAttribute("data-ad-client", "ca-pub-1433248445674721");
-    ad.setAttribute("data-ad-slot", "2462514365");
-    ad.setAttribute("data-ad-format", "auto");
-    ad.setAttribute("data-full-width-responsive", "true");
-
-    document.getElementById("adsense-container").appendChild(ad);
-
-    // Load the script
-    (adsbygoogle = window.adsbygoogle || []).push({});
-  }
+  /*if (window.AdMob) {
+    window.AdMob.rewardVideo.prepare({ id: 'ca-app-pub-1433248445674721/8743592505' })
+        .then(() => window.AdMob.rewardVideo.show())
+        .then(() => {
+          movesLeft += 7;
+          document.getElementById("moves-left").textContent = movesLeft;
+        });
+  } else {
+    document.getElementById("moves-left").textContent = "ADMOB YOK";
+  }*/
 
 });
 
