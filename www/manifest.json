@@ -1,0 +1,10 @@
+{
+  "name": "Target Tap",
+  "short_name": "TargetMath",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f5f5f5",
+  "theme_color": "#0288d1",
+  "icons": [
+  ]
+}

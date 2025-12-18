@@ -15,6 +15,7 @@ const feedbackEl = document.getElementById('feedback');
 const leftBtn = document.getElementById('left-btn');
 const rightBtn = document.getElementById('right-btn');
 // const retryBtn = document.createElement('button'); // Retry button
+
 /*retryBtn.textContent = "New Game";
 retryBtn.style.display = "none";
 document.querySelector('.game-container').appendChild(retryBtn);*/
@@ -24,7 +25,20 @@ const watchAdCntBtn = document.getElementById('watch-ad-continue');
 const scoreEl = document.getElementById('score') || createScoreElement();
 let highScore = parseInt(localStorage.getItem('highScore')) || 0;
 const highScoreEl = document.getElementById('high-score') || createHighScoreElement();
+import {
+  AdMob,
+  BannerAdSize,
+  BannerAdPosition,
+  BannerAdPluginEvents,
+  AdmobConsentStatus
+} from '@capacitor-community/admob';
 
+import { setupRewardedAd, rewardVideo, setupBanner } from "./admob.js";
+function addRewardMoves(am) {
+  movesLeft += am;
+  console.log("Moves added! New total:", movesLeft);
+  document.getElementById("moves-left").textContent = movesLeft;
+}
 function showFeedback(message, success = true) {
   feedbackEl.textContent = message;
   feedbackEl.style.color = success ? "#28a745" : "#f44336";
@@ -113,12 +127,12 @@ function checkEnd() {
     cntBtn.style.display = "block";
     document.getElementById('game-ui').style.display = "none";
 
-    startRound();
+    // startRound();
   } else if (movesLeft <= 0) {
     running = false;
-    showFeedback(`❌ Sorry! No more moves left!`);
+    showFeedback(`❌ Sorry! No more moves left!`, false);
     retryBtn.style.display = "block";              // Show retry
-    watchAdCntBtn.style.display = "block";              // Show retry
+    watchAdCntBtn.style.display = "block";
     document.getElementById('game-ui').style.display = "none";
   }
 }
@@ -133,6 +147,16 @@ retryBtn.addEventListener('click', () => {
   watchAdCntBtn.style.display = "none";                             // Hide retry until next fail
   feedbackEl.textContent = "";
   startRound();
+});
+
+watchAdCntBtn.addEventListener('click', async () => {
+
+  await rewardVideo();
+  running = true;
+  document.getElementById('game-ui').style.display = "block"; // Show UI again
+  retryBtn.style.display = "none";                             // Hide retry until next fail
+  watchAdCntBtn.style.display = "none";                             // Hide retry until next fail
+  feedbackEl.textContent = "";
 });
 
 cntBtn.addEventListener('click', () => {
@@ -158,19 +182,32 @@ rightBtn.addEventListener('click', () => handleClick(rightOp));
 
 const moreTapsBtn = document.getElementById("watch-ad-btn");
 
-moreTapsBtn.addEventListener("click", () => {
-  /*if (window.AdMob) {
-    window.AdMob.rewardVideo.prepare({ id: 'ca-app-pub-1433248445674721/8743592505' })
-        .then(() => window.AdMob.rewardVideo.show())
-        .then(() => {
-          movesLeft += 7;
-          document.getElementById("moves-left").textContent = movesLeft;
-        });
-  } else {
-    document.getElementById("moves-left").textContent = "ADMOB YOK";
-  }*/
+moreTapsBtn.addEventListener("click", async () => {
+
+  await rewardVideo();
+
+
 
 });
+export async function initialize() {
+  await AdMob.initialize({
+    requestTrackingAuthorization: true,
+    testingDevices: ["7C0E983731BBFB0DA5E9F7CD611C0679"],
+    initializeForTesting: false,
+  });
+  console.log("AdMob initialized");
+}
+
+try {
+  await initialize();
+  await setupRewardedAd(addRewardMoves);
+  await setupBanner();
+
+
+} catch (e) {
+  console.error("Problem occured while init:", e);
+}
+
 
 // Start first round
 startRound();

@@ -10,15 +10,7 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0288d1">
     <link rel="stylesheet" href="style.css">
-    <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js')
-                .then(() => console.log('Service Worker registered'))
-                .catch(err => console.log('SW registration failed:', err));
 
-
-        }
-    </script>
 </head>
 <body>
 <div class="game-container">
@@ -60,7 +52,7 @@
         </div>
         <!-- All Time High below buttons -->
         <div class="level-bar">
-            <span class="level-label">Level</span>
+            <span class="level-label">Highest Score</span>
             <span id="high-score" class="level-value">0</span>
         </div>
     </div>
@@ -78,6 +70,7 @@
 </div>
 
 
-<script src="game.js"></script>
+
 </body>
+<script type="module" src="bundle.js"></script>
 </html>
