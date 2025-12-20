@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Contrast Prototype</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #000; /* Left side is black */
+      font-family: sans-serif;
+    }
+
+    /* The Right Side (White/Warm side) */
+    #light-panel {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+      width: 50%; /* Initial split */
+      background-color: #fff;
+      transition: background-color 0.1s ease;
+      cursor: ew-resize;
+    }
+
+    /* Invisible Label (Fades out) */
+    #hint {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: gray;
+      font-size: 12px;
+      letter-spacing: 2px;
+      pointer-events: none;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+
+<div id="light-panel"></div>
+<div id="hint">Slide to Sculpt</div>
+
+<script>
+  const panel = document.getElementById('light-panel');
+  const hint = document.getElementById('hint');
+
+  function updateLight(e) {
+    // Get touch or mouse coordinates
+    const x = e.touches ? e.touches[0].clientX : e.clientX;
+    const y = e.touches ? e.touches[0].clientY : e.clientY;
+
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    // 1. Calculate Split Percentage (Horizontal)
+    const splitPercent = ((width - x) / width) * 100;
+    panel.style.width = splitPercent + "%";
+
+    // 2. Calculate Warmth (Vertical)
+    // Top = Cool Blue, Bottom = Warm Amber
+    const yPercent = y / height;
+    const blue = Math.floor(255 * (1 - yPercent)); // More blue at top
+    const red = 255; // Always keep red high for warmth
+    const green = Math.floor(200 + (55 * (1 - yPercent)));
+
+    // Adjusting the RGB to simulate color temperature
+    // Top: White-Blue | Bottom: Warm Orange/Yellow
+    panel.style.backgroundColor = `rgb(255, ${green}, ${blue})`;
+
+    // Hide hint after first interaction
+    hint.style.opacity = 0;
+  }
+
+  // Event Listeners for both Desktop and Mobile
+  window.addEventListener('mousemove', (e) => {
+    if (e.buttons === 1) updateLight(e); // Only update if clicking
+  });
+  window.addEventListener('touchmove', (e) => {
+    updateLight(e);
+    e.preventDefault(); // Prevent scrolling
+  }, { passive: false });
+
+  // Initial click/touch to start
+  window.addEventListener('mousedown', updateLight);
+</script>
+</body>
+</html>
