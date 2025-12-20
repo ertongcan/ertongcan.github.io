@@ -4,7 +4,7 @@ const btnWhite = document.getElementById('btn-white');
 const btnRed = document.getElementById('btn-red');
 const btnGreen = document.getElementById('btn-green');
 const btnBlue = document.getElementById('btn-blue');
-
+const btnClose = document.getElementById('btn-close');
 const btnSteady = document.getElementById('fx-none');
 const btnPulse = document.getElementById('fx-pulse');
 const btnStrobe = document.getElementById('fx-strobe');
@@ -14,6 +14,9 @@ let state = {
     mode: 'white', isPulsing: false,
     initialPinchDist: 0
 };
+
+function closeMenu() { menu.style.display = 'none'; }
+console.log("Checking for btnClose:", btnClose);
 
     // --- CORE INTERACTION ---
 function updateDisplay() {
@@ -51,7 +54,11 @@ window.addEventListener('touchstart', (e) => {
         // Toggle Menu
         const isHidden = menu.style.display === 'none' || menu.style.display === '';
         menu.style.display = isHidden ? 'flex' : 'none';
-
+        if(isHidden) {
+            btnClose.addEventListener("click",  (e) => {
+                closeMenu();
+            });
+        }
         // Vibrate for feedback (Requires Capacitor Haptics plugin)
         if (window.Capacitor) {
             // Haptics.impact({ style: 'light' });
@@ -62,12 +69,6 @@ window.addEventListener('touchstart', (e) => {
     }
 
 
-});
-const btnClose = document.getElementById('btn-close');
-function closeMenu() { menu.style.display = 'none'; }
-console.log("Checking for btnClose:", btnClose);
-btnClose.addEventListener("click",  () => {
-    closeMenu();
 });
 
 window.addEventListener('touchmove', (e) => {
