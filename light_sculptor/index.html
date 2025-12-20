@@ -98,7 +98,7 @@
   let pressTimer;
   const TRIGGER_ZONE = 60;
   window.addEventListener('touchstart', (e) => {
-    pressTimer = setTimeout(() => {
+
         //menu.style.display = 'flex';
         const touch = e.touches[0];
         const screenWidth = window.innerWidth;
@@ -120,12 +120,11 @@
           return;
         }
 
-      }, 800);
 
   });
 
 window.addEventListener('touchmove', (e) => {
-  clearTimeout(pressTimer);
+  // clearTimeout(pressTimer);
   if (menu.style.display === 'flex') return;
 
   const touch = e.touches[0];
@@ -141,7 +140,7 @@ window.addEventListener('touchmove', (e) => {
   hint.style.opacity = 0;
 });
 
-  window.addEventListener('touchend', () => clearTimeout(pressTimer));
+  // window.addEventListener('touchend', () => clearTimeout(pressTimer));
 
   // --- PRO FEATURES ---
   function setMode(m) {
