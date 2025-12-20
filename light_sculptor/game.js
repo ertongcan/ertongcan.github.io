@@ -17,7 +17,6 @@ let state = {
 };
 
 function closeMenu() { menu.style.display = 'none'; }
-console.log("Checking for btnClose:", btnClose);
 
     // --- CORE INTERACTION ---
 function updateDisplay() {
@@ -110,9 +109,10 @@ let currentSpeed = 500; // milliseconds
 let effectMode = 'none'; // 'none', 'pulse', or 'strobe'
 
 inpSpeed.addEventListener("input", (evt) => {
-    const val = evt.target.value;
+    const val = parseInt(evt.target.value);
+    console.log(val);
 
-    document.getElementById('speed-label').innerText = `SPEED: ${parseInt(val)}ms`;
+    document.getElementById('speed-label').innerText = `SPEED: ${val}ms`;
 
     // Restart effect to apply new speed immediately
     setEffect(effectMode);
