@@ -1,0 +1,10 @@
+{
+  "appId": "com.ertong.lightsculptor",
+  "appName": "light-sculptor",
+  "webDir": "www",
+  "bundledWebRuntime": true,
+  "plugins": {
+    "Keyboard": { "resize": "none" }
+  },
+  "backgroundColor": "#000000"
+}
