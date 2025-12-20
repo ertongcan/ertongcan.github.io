@@ -66,7 +66,8 @@
 
   let state = {
     split: 50, warmth: 255, softness: 0,
-    mode: 'white', isPulsing: false, pulseVal: 1
+    mode: 'white', isPulsing: false, pulseVal: 1,
+    initialPinchDist: 0
   };
 
   // --- CORE INTERACTION ---
@@ -89,6 +90,7 @@
       canvas.style.opacity = 1;
     }
 
+    // Using CSS Variables for high performance
     document.documentElement.style.setProperty('--light-color', color);
     document.documentElement.style.setProperty('--split', state.split + '%');
     document.documentElement.style.setProperty('--softness', state.softness + '%');
@@ -96,26 +98,51 @@
 
   // --- GESTURES ---
   let pressTimer;
+
   window.addEventListener('touchstart', (e) => {
-    pressTimer = setTimeout(() => { menu.style.display = 'flex'; }, 800);
-  });
+    // THREE FINGER TAP: Open/Close Menu
+    if (e.touches.length === 3) {
+      menu.style.display = (menu.style.display === 'flex') ? 'none' : 'flex';
+      hint.style.opacity = 0;
+      return;
+    }
 
-  window.addEventListener('touchmove', (e) => {
-    clearTimeout(pressTimer);
-    if (menu.style.display === 'flex') return;
-
-    const touch = e.touches[0];
-    state.split = (touch.clientX / window.innerWidth) * 100;
-    state.warmth = (touch.clientY / window.innerHeight) * 255;
-
+    // Capture initial distance for pinching
     if (e.touches.length === 2) {
       const dX = e.touches[0].clientX - e.touches[1].clientX;
       const dY = e.touches[0].clientY - e.touches[1].clientY;
-      state.softness = Math.min(45, Math.sqrt(dX*dX + dY*dY) / 10);
+      state.initialPinchDist = Math.sqrt(dX * dX + dY * dY);
     }
+  }, { passive: false });
+
+  window.addEventListener('touchmove', (e) => {
+    // If menu is open, don't move the light behind it
+    if (menu.style.display === 'flex') return;
+    e.preventDefault(); // Critical for Capacitor: stops pull-to-refresh
+
+    if (e.touches.length === 1) {
+      // ONE FINGER: X/Y Control
+      const touch = e.touches[0];
+      state.split = (touch.clientX / window.innerWidth) * 100;
+      state.warmth = (touch.clientY / window.innerHeight) * 255;
+    }
+    else if (e.touches.length === 2) {
+      // TWO FINGERS: Pinch to Blur
+      const dX = e.touches[0].clientX - e.touches[1].clientX;
+      const dY = e.touches[0].clientY - e.touches[1].clientY;
+      const currentDist = Math.sqrt(dX * dX + dY * dY);
+
+      // Calculate change in distance
+      const sensitivity = 0.15;
+      const delta = (currentDist - state.initialPinchDist) * sensitivity;
+
+      state.softness = Math.max(0, Math.min(45, state.softness + delta));
+      state.initialPinchDist = currentDist; // Reset for smooth scaling
+    }
+
     updateDisplay();
     hint.style.opacity = 0;
-  });
+  }, { passive: false });
 
   window.addEventListener('touchend', () => clearTimeout(pressTimer));
 
