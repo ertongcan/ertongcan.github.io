@@ -143,7 +143,7 @@ function setEffect(mode) {
 }
 
 btnSteady.addEventListener("click",  () => {
-    setEffect("steady");
+    setEffect("none");
 });
 
 btnStrobe.addEventListener("click",  () => {
@@ -162,15 +162,15 @@ function updateSpeed(val) {
     setEffect(effectMode);
 }
 
-    function runPulse() {
+function runPulse() {
     // Pulse is a soft CSS transition
     canvas.style.transition = `opacity ${currentSpeed}ms ease-in-out`;
     let toggle = false;
 
     effectInterval = setInterval(() => {
-    canvas.style.opacity = toggle ? 1 : 0.1;
-    toggle = !toggle;
-}, currentSpeed);
+        canvas.style.opacity = toggle ? 1 : 0.1;
+        toggle = !toggle;
+    }, currentSpeed);
 }
 
 function runStrobe() {
