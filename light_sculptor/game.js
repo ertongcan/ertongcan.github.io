@@ -5,6 +5,9 @@ const btnRed = document.getElementById('btn-red');
 const btnGreen = document.getElementById('btn-green');
 const btnBlue = document.getElementById('btn-blue');
 const btnClose = document.getElementById('btn-close');
+const btnSteady = document.getElementById('btn-steady');
+const btnPulse = document.getElementById('btn-pulse');
+const btnStrobe = document.getElementById('btn-strobe');
 
 let state = {
     split: 50, warmth: 255, softness: 0,
@@ -139,7 +142,19 @@ function setEffect(mode) {
     }
 }
 
-    function updateSpeed(val) {
+btnSteady.addEventListener("click",  () => {
+    setEffect("steady");
+});
+
+btnStrobe.addEventListener("click",  () => {
+    setEffect("strobe");
+});
+
+btnPulse.addEventListener("click",  () => {
+    setEffect("pulse");
+});
+
+function updateSpeed(val) {
     currentSpeed = val;
     document.getElementById('speed-label').innerText = `SPEED: ${val}ms`;
 
