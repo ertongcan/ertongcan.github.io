@@ -4,7 +4,7 @@ const btnWhite = document.getElementById('btn-white');
 const btnRed = document.getElementById('btn-red');
 const btnGreen = document.getElementById('btn-green');
 const btnBlue = document.getElementById('btn-blue');
-const btnClose = document.getElementById('btn-close');
+
 const btnSteady = document.getElementById('fx-none');
 const btnPulse = document.getElementById('fx-pulse');
 const btnStrobe = document.getElementById('fx-strobe');
@@ -35,9 +35,9 @@ function updateDisplay() {
     document.documentElement.style.setProperty('--softness', state.softness + '%');
 }
 
-    // --- GESTURES ---
-    let pressTimer;
-    const TRIGGER_ZONE = 60;
+// --- GESTURES ---
+let pressTimer;
+const TRIGGER_ZONE = 60;
 window.addEventListener('touchstart', (e) => {
 
     //menu.style.display = 'flex';
@@ -48,24 +48,24 @@ window.addEventListener('touchstart', (e) => {
     const isTopRight = (touch.clientX > screenWidth - TRIGGER_ZONE) && (touch.clientY < TRIGGER_ZONE);
 
     if (isTopRight) {
-    // Toggle Menu
-    const isHidden = menu.style.display === 'none' || menu.style.display === '';
-    menu.style.display = isHidden ? 'flex' : 'none';
+        // Toggle Menu
+        const isHidden = menu.style.display === 'none' || menu.style.display === '';
+        menu.style.display = isHidden ? 'flex' : 'none';
 
-    // Vibrate for feedback (Requires Capacitor Haptics plugin)
-    if (window.Capacitor) {
-    // Haptics.impact({ style: 'light' });
-}
+        // Vibrate for feedback (Requires Capacitor Haptics plugin)
+        if (window.Capacitor) {
+            // Haptics.impact({ style: 'light' });
+        }
 
-    // Prevent the light from shifting when we just wanted the menu
-    return;
-}
+        // Prevent the light from shifting when we just wanted the menu
+        return;
+    }
 
 
 });
-
+const btnClose = document.getElementById('btn-close');
 function closeMenu() { menu.style.display = 'none'; }
-console.log("Checking for btnClose:", document.getElementById("btnClose"));
+console.log("Checking for btnClose:", btnClose);
 btnClose.addEventListener("click",  () => {
     closeMenu();
 });
