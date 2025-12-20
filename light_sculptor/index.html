@@ -65,8 +65,9 @@
   const hint = document.getElementById('hint');
 
   let state = {
-    split: 50, warmth: 255, softness: 0,
-    mode: 'white', isPulsing: false, pulseVal: 1
+      split: 50, warmth: 255, softness: 0,
+      mode: 'white', isPulsing: false, pulseVal: 1,
+      initialPinchDist: 0
   };
 
   // --- CORE INTERACTION ---
@@ -126,7 +127,7 @@
 window.addEventListener('touchmove', (e) => {
   // clearTimeout(pressTimer);
   if (menu.style.display === 'flex') return;
-
+    e.preventDefault();
   const touch = e.touches[0];
   state.split = (touch.clientX / window.innerWidth) * 100;
   state.warmth = (touch.clientY / window.innerHeight) * 255;
