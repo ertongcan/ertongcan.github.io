@@ -134,7 +134,13 @@ window.addEventListener('touchmove', (e) => {
   if (e.touches.length === 2) {
     const dX = e.touches[0].clientX - e.touches[1].clientX;
     const dY = e.touches[0].clientY - e.touches[1].clientY;
-    state.softness = Math.min(45, Math.sqrt(dX*dX + dY*dY) / 10);
+      const currentDist = Math.sqrt(dX * dX + dY * dY);
+      // Calculate change in distance
+      const sensitivity = 0.15;
+      const delta = (currentDist - state.initialPinchDist) * sensitivity;
+
+      state.softness = Math.max(0, Math.min(45, state.softness + delta));
+      state.initialPinchDist = currentDist; // Reset for smooth scaling
   }
   updateDisplay();
   hint.style.opacity = 0;
