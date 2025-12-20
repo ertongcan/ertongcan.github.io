@@ -5,9 +5,9 @@ const btnRed = document.getElementById('btn-red');
 const btnGreen = document.getElementById('btn-green');
 const btnBlue = document.getElementById('btn-blue');
 const btnClose = document.getElementById('btn-close');
-const btnSteady = document.getElementById('btn-steady');
-const btnPulse = document.getElementById('btn-pulse');
-const btnStrobe = document.getElementById('btn-strobe');
+const btnSteady = document.getElementById('fx-none');
+const btnPulse = document.getElementById('fx-pulse');
+const btnStrobe = document.getElementById('fx-strobe');
 
 let state = {
     split: 50, warmth: 255, softness: 0,
