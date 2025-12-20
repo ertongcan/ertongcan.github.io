@@ -139,16 +139,25 @@
 }, currentSpeed);
 }
 
-    function runStrobe() {
+function runStrobe() {
     // Strobe is a sharp cut (no transition)
     canvas.style.transition = 'none';
 
     effectInterval = setInterval(() => {
-    canvas.style.opacity = 0; // Flash Off
-    setTimeout(() => {
-    canvas.style.opacity = 1; // Flash On
-}, 10); // 10ms "On" time creates a sharp frozen-motion effect
-}, currentSpeed);
+        canvas.style.opacity = 0; // Flash Off
+        setTimeout(() => {
+            canvas.style.opacity = 1; // Flash On
+        }, 10); // 10ms "On" time creates a sharp frozen-motion effect
+    }, currentSpeed);
 }
 
-    function closeMenu() { menu.style.display = 'none'; }
+
+function closeMenu() { menu.style.display = 'none'; }
+
+window.closeMenu = closeMenu();
+window.runStrobe = runStrobe();
+window.setEffect = setEffect();
+window.updateSpeed = updateSpeed();
+window.setMode = setMode();
+window.updateDisplay = updateDisplay();
+window.runPulse = runPulse();
