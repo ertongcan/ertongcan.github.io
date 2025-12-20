@@ -110,7 +110,6 @@ let effectMode = 'none'; // 'none', 'pulse', or 'strobe'
 
 inpSpeed.addEventListener("input", (evt) => {
     const val = parseInt(evt.target.value);
-    console.log(val);
 
     document.getElementById('speed-label').innerText = `SPEED: ${val}ms`;
 
