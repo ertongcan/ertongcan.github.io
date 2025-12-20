@@ -97,25 +97,48 @@
   // --- GESTURES ---
   let pressTimer;
   window.addEventListener('touchstart', (e) => {
-    pressTimer = setTimeout(() => { menu.style.display = 'flex'; }, 800);
+    pressTimer = setTimeout(() => {
+        //menu.style.display = 'flex';
+        const touch = e.touches[0];
+        const screenWidth = window.innerWidth;
+
+        // Check if the touch is in the top-right corner
+        const isTopRight = (touch.clientX > screenWidth - TRIGGER_ZONE) && (touch.clientY < TRIGGER_ZONE);
+
+        if (isTopRight) {
+          // Toggle Menu
+          const isHidden = menu.style.display === 'none' || menu.style.display === '';
+          menu.style.display = isHidden ? 'flex' : 'none';
+
+          // Vibrate for feedback (Requires Capacitor Haptics plugin)
+          if (window.Capacitor) {
+            // Haptics.impact({ style: 'light' });
+          }
+
+          // Prevent the light from shifting when we just wanted the menu
+          return;
+        }
+
+      }, 800);
+
   });
 
-  window.addEventListener('touchmove', (e) => {
-    clearTimeout(pressTimer);
-    if (menu.style.display === 'flex') return;
+window.addEventListener('touchmove', (e) => {
+  clearTimeout(pressTimer);
+  if (menu.style.display === 'flex') return;
 
-    const touch = e.touches[0];
-    state.split = (touch.clientX / window.innerWidth) * 100;
-    state.warmth = (touch.clientY / window.innerHeight) * 255;
+  const touch = e.touches[0];
+  state.split = (touch.clientX / window.innerWidth) * 100;
+  state.warmth = (touch.clientY / window.innerHeight) * 255;
 
-    if (e.touches.length === 2) {
-      const dX = e.touches[0].clientX - e.touches[1].clientX;
-      const dY = e.touches[0].clientY - e.touches[1].clientY;
-      state.softness = Math.min(45, Math.sqrt(dX*dX + dY*dY) / 10);
-    }
-    updateDisplay();
-    hint.style.opacity = 0;
-  });
+  if (e.touches.length === 2) {
+    const dX = e.touches[0].clientX - e.touches[1].clientX;
+    const dY = e.touches[0].clientY - e.touches[1].clientY;
+    state.softness = Math.min(45, Math.sqrt(dX*dX + dY*dY) / 10);
+  }
+  updateDisplay();
+  hint.style.opacity = 0;
+});
 
   window.addEventListener('touchend', () => clearTimeout(pressTimer));
 
