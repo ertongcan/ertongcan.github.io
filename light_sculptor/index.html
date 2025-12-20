@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Contrast Prototype</title>
+  <title>Contrast: Sculpt</title>
   <style>
     body, html {
       margin: 0;
@@ -11,83 +11,104 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background-color: #000; /* Left side is black */
-      font-family: sans-serif;
+      background-color: #000;
+      touch-action: none; /* Prevents browser zoom/scroll */
     }
 
-    /* The Right Side (White/Warm side) */
-    #light-panel {
-      position: absolute;
-      top: 0;
-      right: 0;
+    /* This div will hold the gradient background */
+    #canvas {
+      width: 100%;
       height: 100%;
-      width: 50%; /* Initial split */
-      background-color: #fff;
-      transition: background-color 0.1s ease;
-      cursor: ew-resize;
+      transition: background 0.05s linear;
     }
 
-    /* Invisible Label (Fades out) */
     #hint {
       position: absolute;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      color: gray;
-      font-size: 12px;
-      letter-spacing: 2px;
-      pointer-events: none;
+      bottom: 30px;
+      width: 100%;
+      text-align: center;
+      color: rgba(128, 128, 128, 0.5);
+      font-family: 'Inter', sans-serif;
+      font-size: 10px;
+      letter-spacing: 3px;
       text-transform: uppercase;
+      pointer-events: none;
     }
   </style>
 </head>
 <body>
 
-<div id="light-panel"></div>
-<div id="hint">Slide to Sculpt</div>
+<div id="canvas"></div>
+<div id="hint">Slide to move • Pinch to blur</div>
 
 <script>
-  const panel = document.getElementById('light-panel');
+  const canvas = document.getElementById('canvas');
   const hint = document.getElementById('hint');
 
-  function updateLight(e) {
-    // Get touch or mouse coordinates
-    const x = e.touches ? e.touches[0].clientX : e.clientX;
-    const y = e.touches ? e.touches[0].clientY : e.clientY;
+  let state = {
+    split: 50,      // X axis (0-100)
+    warmth: 255,    // Y axis (Blue component)
+    softness: 0,    // Pinch (0-40)
+    initialDist: 0  // For pinch math
+  };
 
-    const width = window.innerWidth;
-    const height = window.innerHeight;
+  function updateDisplay() {
+    // Calculate Warmth Color
+    const r = 255;
+    const g = Math.max(180, state.warmth);
+    const b = state.warmth;
+    const lightColor = `rgb(${r}, ${g}, ${b})`;
 
-    // 1. Calculate Split Percentage (Horizontal)
-    const splitPercent = ((width - x) / width) * 100;
-    panel.style.width = splitPercent + "%";
+    // Create the gradient string
+    // Softness defines how far apart the Black and Light colors are
+    const edge1 = state.split - state.softness;
+    const edge2 = state.split + state.softness;
 
-    // 2. Calculate Warmth (Vertical)
-    // Top = Cool Blue, Bottom = Warm Amber
-    const yPercent = y / height;
-    const blue = Math.floor(255 * (1 - yPercent)); // More blue at top
-    const red = 255; // Always keep red high for warmth
-    const green = Math.floor(200 + (55 * (1 - yPercent)));
-
-    // Adjusting the RGB to simulate color temperature
-    // Top: White-Blue | Bottom: Warm Orange/Yellow
-    panel.style.backgroundColor = `rgb(255, ${green}, ${blue})`;
-
-    // Hide hint after first interaction
-    hint.style.opacity = 0;
+    canvas.style.background = `linear-gradient(to right, #000 ${edge1}%, ${lightColor} ${edge2}%)`;
   }
 
-  // Event Listeners for both Desktop and Mobile
-  window.addEventListener('mousemove', (e) => {
-    if (e.buttons === 1) updateLight(e); // Only update if clicking
-  });
-  window.addEventListener('touchmove', (e) => {
-    updateLight(e);
-    e.preventDefault(); // Prevent scrolling
-  }, { passive: false });
+  function handleTouch(e) {
+    hint.style.opacity = 0;
 
-  // Initial click/touch to start
-  window.addEventListener('mousedown', updateLight);
+    if (e.touches.length === 1) {
+      // SINGLE TOUCH: Move Split and Warmth
+      const touch = e.touches[0];
+      state.split = (touch.clientX / window.innerWidth) * 100;
+
+      // Vertical move changes blue channel (255 = white, 0 = orange)
+      state.warmth = (touch.clientY / window.innerHeight) * 255;
+
+    } else if (e.touches.length === 2) {
+      // MULTI TOUCH: Pinch for Softness
+      const dX = e.touches[0].clientX - e.touches[1].clientX;
+      const dY = e.touches[0].clientY - e.touches[1].clientY;
+      const dist = Math.sqrt(dX * dX + dY * dY);
+
+      if (state.initialDist === 0) {
+        state.initialDist = dist;
+      } else {
+        // Adjust softness based on change in distance
+        const diff = (dist - state.initialDist) / 10;
+        state.softness = Math.max(0, Math.min(40, state.softness + diff));
+        state.initialDist = dist;
+      }
+    }
+    updateDisplay();
+  }
+
+  window.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 2) {
+      const dX = e.touches[0].clientX - e.touches[1].clientX;
+      const dY = e.touches[0].clientY - e.touches[1].clientY;
+      state.initialDist = Math.sqrt(dX * dX + dY * dY);
+    }
+  });
+
+  window.addEventListener('touchmove', handleTouch, { passive: false });
+  window.addEventListener('touchend', () => { state.initialDist = 0; });
+
+  // Run once to set initial view
+  updateDisplay();
 </script>
 </body>
 </html>
