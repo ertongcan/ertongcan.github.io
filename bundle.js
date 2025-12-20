@@ -106,8 +106,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   ADID: () => (/* binding */ ADID),
 /* harmony export */   ADID_INTER: () => (/* binding */ ADID_INTER)
 /* harmony export */ });
-const ADID ='ca-app-pub-1433248445674721/6971716969';
-const ADID_INTER ="ca-app-pub-1433248445674721/6825760194";
+const ADID ='XXX';
+const ADID_INTER ="XXX";
 
 
 /***/ }),
@@ -1798,7 +1798,7 @@ const CapacitorHttp = registerPlugin('CapacitorHttp', {
 /************************************************************************/
 /******/ 	// The module cache
 /******/ 	var __webpack_module_cache__ = {};
-/******/ 	
+/******/
 /******/ 	// The require function
 /******/ 	function __webpack_require__(moduleId) {
 /******/ 		// Check if module is in cache
@@ -1812,17 +1812,17 @@ const CapacitorHttp = registerPlugin('CapacitorHttp', {
 /******/ 			// no module.loaded needed
 /******/ 			exports: {}
 /******/ 		};
-/******/ 	
+/******/
 /******/ 		// Execute the module function
 /******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
-/******/ 	
+/******/
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
-/******/ 	
+/******/
 /******/ 	// expose the modules object (__webpack_modules__)
 /******/ 	__webpack_require__.m = __webpack_modules__;
-/******/ 	
+/******/
 /************************************************************************/
 /******/ 	/* webpack/runtime/async module */
 /******/ 	(() => {
@@ -1830,7 +1830,7 @@ const CapacitorHttp = registerPlugin('CapacitorHttp', {
 /******/ 		var webpackQueues = hasSymbol ? Symbol("webpack queues") : "__webpack_queues__";
 /******/ 		var webpackExports = hasSymbol ? Symbol("webpack exports") : "__webpack_exports__";
 /******/ 		var webpackError = hasSymbol ? Symbol("webpack error") : "__webpack_error__";
-/******/ 		
+/******/
 /******/ 		var resolveQueue = (queue) => {
 /******/ 			if(queue && queue.d < 1) {
 /******/ 				queue.d = 1;
@@ -1840,7 +1840,7 @@ const CapacitorHttp = registerPlugin('CapacitorHttp', {
 /******/ 		}
 /******/ 		var wrapDeps = (deps) => (deps.map((dep) => {
 /******/ 			if(dep !== null && typeof dep === "object") {
-/******/ 		
+/******/
 /******/ 				if(dep[webpackQueues]) return dep;
 /******/ 				if(dep.then) {
 /******/ 					var queue = [];
@@ -1853,7 +1853,7 @@ const CapacitorHttp = registerPlugin('CapacitorHttp', {
 /******/ 						resolveQueue(queue);
 /******/ 					});
 /******/ 					var obj = {};
-/******/ 		
+/******/
 /******/ 					obj[webpackQueues] = (fn) => (fn(queue));
 /******/ 					return obj;
 /******/ 				}
@@ -1882,7 +1882,7 @@ const CapacitorHttp = registerPlugin('CapacitorHttp', {
 /******/ 				currentDeps = wrapDeps(deps);
 /******/ 				var fn;
 /******/ 				var getResult = () => (currentDeps.map((d) => {
-/******/ 		
+/******/
 /******/ 					if(d[webpackError]) throw d[webpackError];
 /******/ 					return d[webpackExports];
 /******/ 				}))
@@ -1899,7 +1899,7 @@ const CapacitorHttp = registerPlugin('CapacitorHttp', {
 /******/ 			queue && queue.d < 0 && (queue.d = 0);
 /******/ 		};
 /******/ 	})();
-/******/ 	
+/******/
 /******/ 	/* webpack/runtime/define property getters */
 /******/ 	(() => {
 /******/ 		// define getter functions for harmony exports
@@ -1911,7 +1911,7 @@ const CapacitorHttp = registerPlugin('CapacitorHttp', {
 /******/ 			}
 /******/ 		};
 /******/ 	})();
-/******/ 	
+/******/
 /******/ 	/* webpack/runtime/ensure chunk */
 /******/ 	(() => {
 /******/ 		__webpack_require__.f = {};
@@ -1924,7 +1924,7 @@ const CapacitorHttp = registerPlugin('CapacitorHttp', {
 /******/ 			}, []));
 /******/ 		};
 /******/ 	})();
-/******/ 	
+/******/
 /******/ 	/* webpack/runtime/get javascript chunk filename */
 /******/ 	(() => {
 /******/ 		// This function allow to reference async chunks
@@ -1933,7 +1933,7 @@ const CapacitorHttp = registerPlugin('CapacitorHttp', {
 /******/ 			return "" + chunkId + ".bundle.js";
 /******/ 		};
 /******/ 	})();
-/******/ 	
+/******/
 /******/ 	/* webpack/runtime/global */
 /******/ 	(() => {
 /******/ 		__webpack_require__.g = (function() {
@@ -1945,12 +1945,12 @@ const CapacitorHttp = registerPlugin('CapacitorHttp', {
 /******/ 			}
 /******/ 		})();
 /******/ 	})();
-/******/ 	
+/******/
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
 /******/ 	(() => {
 /******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
 /******/ 	})();
-/******/ 	
+/******/
 /******/ 	/* webpack/runtime/load script */
 /******/ 	(() => {
 /******/ 		var inProgress = {};
@@ -1969,13 +1969,13 @@ const CapacitorHttp = registerPlugin('CapacitorHttp', {
 /******/ 			if(!script) {
 /******/ 				needAttach = true;
 /******/ 				script = document.createElement('script');
-/******/ 		
+/******/
 /******/ 				script.charset = 'utf-8';
 /******/ 				if (__webpack_require__.nc) {
 /******/ 					script.setAttribute("nonce", __webpack_require__.nc);
 /******/ 				}
-/******/ 		
-/******/ 		
+/******/
+/******/
 /******/ 				script.src = url;
 /******/ 			}
 /******/ 			inProgress[url] = [done];
@@ -1995,7 +1995,7 @@ const CapacitorHttp = registerPlugin('CapacitorHttp', {
 /******/ 			needAttach && document.head.appendChild(script);
 /******/ 		};
 /******/ 	})();
-/******/ 	
+/******/
 /******/ 	/* webpack/runtime/make namespace object */
 /******/ 	(() => {
 /******/ 		// define __esModule on exports
@@ -2006,7 +2006,7 @@ const CapacitorHttp = registerPlugin('CapacitorHttp', {
 /******/ 			Object.defineProperty(exports, '__esModule', { value: true });
 /******/ 		};
 /******/ 	})();
-/******/ 	
+/******/
 /******/ 	/* webpack/runtime/publicPath */
 /******/ 	(() => {
 /******/ 		var scriptUrl;
@@ -2029,23 +2029,23 @@ const CapacitorHttp = registerPlugin('CapacitorHttp', {
 /******/ 		scriptUrl = scriptUrl.replace(/^blob:/, "").replace(/#.*$/, "").replace(/\?.*$/, "").replace(/\/[^\/]+$/, "/");
 /******/ 		__webpack_require__.p = scriptUrl;
 /******/ 	})();
-/******/ 	
+/******/
 /******/ 	/* webpack/runtime/jsonp chunk loading */
 /******/ 	(() => {
 /******/ 		// no baseURI
-/******/ 		
+/******/
 /******/ 		// object to store loaded and loading chunks
 /******/ 		// undefined = chunk not loaded, null = chunk preloaded/prefetched
 /******/ 		// [resolve, reject, Promise] = chunk loading, 0 = chunk loaded
 /******/ 		var installedChunks = {
 /******/ 			"main": 0
 /******/ 		};
-/******/ 		
+/******/
 /******/ 		__webpack_require__.f.j = (chunkId, promises) => {
 /******/ 				// JSONP chunk loading for javascript
 /******/ 				var installedChunkData = __webpack_require__.o(installedChunks, chunkId) ? installedChunks[chunkId] : undefined;
 /******/ 				if(installedChunkData !== 0) { // 0 means "already installed".
-/******/ 		
+/******/
 /******/ 					// a Promise means "currently loading".
 /******/ 					if(installedChunkData) {
 /******/ 						promises.push(installedChunkData[2]);
@@ -2054,7 +2054,7 @@ const CapacitorHttp = registerPlugin('CapacitorHttp', {
 /******/ 							// setup Promise in chunk cache
 /******/ 							var promise = new Promise((resolve, reject) => (installedChunkData = installedChunks[chunkId] = [resolve, reject]));
 /******/ 							promises.push(installedChunkData[2] = promise);
-/******/ 		
+/******/
 /******/ 							// start chunk loading
 /******/ 							var url = __webpack_require__.p + __webpack_require__.u(chunkId);
 /******/ 							// create error before stack unwound to get useful stacktrace later
@@ -2079,17 +2079,17 @@ const CapacitorHttp = registerPlugin('CapacitorHttp', {
 /******/ 					}
 /******/ 				}
 /******/ 		};
-/******/ 		
+/******/
 /******/ 		// no prefetching
-/******/ 		
+/******/
 /******/ 		// no preloaded
-/******/ 		
+/******/
 /******/ 		// no HMR
-/******/ 		
+/******/
 /******/ 		// no HMR manifest
-/******/ 		
+/******/
 /******/ 		// no on chunks loaded
-/******/ 		
+/******/
 /******/ 		// install a JSONP callback for chunk loading
 /******/ 		var webpackJsonpCallback = (parentChunkLoadingFunction, data) => {
 /******/ 			var [chunkIds, moreModules, runtime] = data;
@@ -2112,21 +2112,21 @@ const CapacitorHttp = registerPlugin('CapacitorHttp', {
 /******/ 				}
 /******/ 				installedChunks[chunkId] = 0;
 /******/ 			}
-/******/ 		
+/******/
 /******/ 		}
-/******/ 		
+/******/
 /******/ 		var chunkLoadingGlobal = self["webpackChunk"] = self["webpackChunk"] || [];
 /******/ 		chunkLoadingGlobal.forEach(webpackJsonpCallback.bind(null, 0));
 /******/ 		chunkLoadingGlobal.push = webpackJsonpCallback.bind(null, chunkLoadingGlobal.push.bind(chunkLoadingGlobal));
 /******/ 	})();
-/******/ 	
+/******/
 /************************************************************************/
-/******/ 	
+/******/
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module used 'module' so it can't be inlined
 /******/ 	var __webpack_exports__ = __webpack_require__("./game.js");
-/******/ 	
+/******/
 /******/ })()
 ;
 //# sourceMappingURL=bundle.js.map
