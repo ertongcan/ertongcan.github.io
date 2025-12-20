@@ -124,7 +124,7 @@
 }
 }
 
-    function updateSpeed(val) {
+function updateSpeed(val) {
     currentSpeed = val;
     document.getElementById('speed-label').innerText = `SPEED: ${val}ms`;
 
@@ -132,30 +132,30 @@
     setEffect(effectMode);
 }
 
-    function runPulse() {
+function runPulse() {
     // Pulse is a soft CSS transition
     canvas.style.transition = `opacity ${currentSpeed}ms ease-in-out`;
     let toggle = false;
 
     effectInterval = setInterval(() => {
-    canvas.style.opacity = toggle ? 1 : 0.1;
-    toggle = !toggle;
-}, currentSpeed);
+        canvas.style.opacity = toggle ? 1 : 0.1;
+        toggle = !toggle;
+    }, currentSpeed);
 }
 
-    function runStrobe() {
+function runStrobe() {
     // Strobe is a sharp cut (no transition)
     canvas.style.transition = 'none';
 
     effectInterval = setInterval(() => {
     canvas.style.opacity = 0; // Flash Off
     setTimeout(() => {
-    canvas.style.opacity = 1; // Flash On
-}, 10); // 10ms "On" time creates a sharp frozen-motion effect
+        canvas.style.opacity = 1; // Flash On
+    }, 10); // 10ms "On" time creates a sharp frozen-motion effect
 }, currentSpeed);
 }
 
-    function closeMenu() { menu.style.display = 'none'; }
+function closeMenu() { menu.style.display = 'none'; }
 
 /******/ })()
 ;
