@@ -1,13 +1,12 @@
-import {rewardVideo} from "../admob";
-
 const canvas = document.getElementById('canvas');
 const menu = document.getElementById('menu');
 const btnWhite = document.getElementById('btn-white');
 const btnRed = document.getElementById('btn-red');
 const btnGreen = document.getElementById('btn-green');
 const btnBlue = document.getElementById('btn-blue');
+const btnClose = document.getElementById('btn-close');
 
-    let state = {
+let state = {
     split: 50, warmth: 255, softness: 0,
     mode: 'white', isPulsing: false, pulseVal: 1,
     initialPinchDist: 0
@@ -104,19 +103,19 @@ let effectInterval = null;
 let currentSpeed = 500; // milliseconds
 let effectMode = 'none'; // 'none', 'pulse', or 'strobe'
 
-btnWhite.addEventListener("click", async () => {
+btnWhite.addEventListener("click", () => {
     setMode('white');
 });
 
-btnGreen.addEventListener("click", async () => {
+btnGreen.addEventListener("click", () => {
     setMode('green');
 });
 
-btnRed.addEventListener("click", async () => {
+btnRed.addEventListener("click", () => {
     setMode('red');
 });
 
-btnBlue.addEventListener("click", async () => {
+btnBlue.addEventListener("click", () => {
     setMode('blue');
 });
 function setEffect(mode) {
@@ -173,3 +172,7 @@ function runStrobe() {
 
 
 function closeMenu() { menu.style.display = 'none'; }
+
+btnClose.addEventListener("click",  () => {
+    closeMenu();
+});
