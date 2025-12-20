@@ -11,29 +11,24 @@ const btnStrobe = document.getElementById('fx-strobe');
 
 let state = {
     split: 50, warmth: 255, softness: 0,
-    mode: 'white', isPulsing: false, pulseVal: 1,
+    mode: 'white', isPulsing: false,
     initialPinchDist: 0
 };
 
     // --- CORE INTERACTION ---
-    function updateDisplay() {
+function updateDisplay() {
     let color;
     if (state.mode === 'white') {
     color = `rgb(255, ${Math.max(180, state.warmth)}, ${state.warmth})`;
-} else if (state.mode === 'red') {
-    color = `rgb(${state.warmth}, 0, 0)`;
-} else if (state.mode === 'blue') {
-    color = `rgb(0, 0, ${state.warmth})`;
-} else if (state.mode === 'green') {
-    color = `rgb(0, ${state.warmth}, 0)`;
-}
+    } else if (state.mode === 'red') {
+        color = `rgb(${state.warmth}, 0, 0)`;
+    } else if (state.mode === 'blue') {
+        color = `rgb(0, 0, ${state.warmth})`;
+    } else if (state.mode === 'green') {
+        color = `rgb(0, ${state.warmth}, 0)`;
+    }
 
-    // Apply Pulse
-    if (state.isPulsing) {
-    canvas.style.opacity = state.pulseVal;
-} else {
     canvas.style.opacity = 1;
-}
 
     document.documentElement.style.setProperty('--light-color', color);
     document.documentElement.style.setProperty('--split', state.split + '%');
@@ -106,6 +101,7 @@ let effectInterval = null;
 let currentSpeed = 500; // milliseconds
 let effectMode = 'none'; // 'none', 'pulse', or 'strobe'
 
+setMode("white")
 btnWhite.addEventListener("click", () => {
     setMode('white');
 });
