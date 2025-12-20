@@ -182,7 +182,7 @@ function runStrobe() {
 
 
 function closeMenu() { menu.style.display = 'none'; }
-
+console.log("Checking for btnClose:", document.getElementById("btnClose"));
 btnClose.addEventListener("click",  () => {
     closeMenu();
 });
