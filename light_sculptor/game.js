@@ -90,10 +90,10 @@ window.addEventListener('touchmove', (e) => {
     // window.addEventListener('touchend', () => clearTimeout(pressTimer));
 
     // --- PRO FEATURES ---
-function setMode(m) {
+function setMode(m, evt) {
     state.mode = m;
     document.querySelectorAll('.btn-group button').forEach(b => b.classList.remove('active'));
-    event.target.classList.add('active');
+    evt.target.classList.add('active');
     updateDisplay();
 }
 
@@ -101,20 +101,20 @@ let effectInterval = null;
 let currentSpeed = 500; // milliseconds
 let effectMode = 'none'; // 'none', 'pulse', or 'strobe'
 
-btnWhite.addEventListener("click", () => {
-    setMode('white');
+btnWhite.addEventListener("click", (evt) => {
+    setMode('white', evt);
 });
 
-btnGreen.addEventListener("click", () => {
-    setMode('green');
+btnGreen.addEventListener("click", (evt) => {
+    setMode('green', evt);
 });
 
-btnRed.addEventListener("click", () => {
-    setMode('red');
+btnRed.addEventListener("click", (evt) => {
+    setMode('red', evt);
 });
 
-btnBlue.addEventListener("click", () => {
-    setMode('blue');
+btnBlue.addEventListener("click", (evt) => {
+    setMode('blue', evt);
 });
 function setEffect(mode) {
     effectMode = mode;
