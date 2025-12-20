@@ -3,112 +3,144 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Contrast: Sculpt</title>
+  <title>LUME PRO</title>
   <style>
-    body, html {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background-color: #000;
-      touch-action: none; /* Prevents browser zoom/scroll */
+    :root { --light-color: rgb(255, 255, 255); --softness: 0%; --split: 50%; }
+    body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; touch-action: none; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+
+    /* The Main Canvas */
+    #canvas {
+      width: 100%; height: 100%;
+      background: linear-gradient(to right, #000 calc(var(--split) - var(--softness)), var(--light-color) calc(var(--split) + var(--softness)));
     }
 
-    /* This div will hold the gradient background */
-    #canvas {
-      width: 100%;
-      height: 100%;
-      transition: background 0.05s linear;
+    /* Hidden Professional Menu */
+    #menu {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8); display: none; flex-direction: column;
+      justify-content: center; align-items: center; color: white; backdrop-filter: blur(10px);
     }
+
+    .menu-row { margin: 20px; text-align: center; }
+    .btn-group { display: flex; gap: 10px; margin-top: 10px; }
+    button {
+      background: #333; border: 1px solid #555; color: white; padding: 12px 20px;
+      border-radius: 8px; font-size: 14px; cursor: pointer;
+    }
+    button.active { background: #fff; color: #000; font-weight: bold; }
 
     #hint {
-      position: absolute;
-      bottom: 30px;
-      width: 100%;
-      text-align: center;
-      color: rgba(128, 128, 128, 0.5);
-      font-family: 'Inter', sans-serif;
-      font-size: 10px;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      pointer-events: none;
+      position: absolute; bottom: 20px; width: 100%; text-align: center;
+      color: rgba(255,255,255,0.3); font-size: 10px; letter-spacing: 2px; pointer-events: none;
     }
   </style>
 </head>
 <body>
 
 <div id="canvas"></div>
-<div id="hint">Slide to move • Pinch to blur</div>
+<div id="hint">LONG PRESS FOR PRO TOOLS</div>
+
+<div id="menu">
+  <div class="menu-row">
+    <div>COLOR GELS</div>
+    <div class="btn-group">
+      <button onclick="setMode('white')" id="btn-white" class="active">WHITE</button>
+      <button onclick="setMode('red')">RED</button>
+      <button onclick="setMode('blue')">BLUE</button>
+      <button onclick="setMode('green')">GREEN</button>
+    </div>
+  </div>
+  <div class="menu-row">
+    <div>EFFECTS</div>
+    <div class="btn-group">
+      <button onclick="togglePulse()" id="btn-pulse">PULSE: OFF</button>
+    </div>
+  </div>
+  <button onclick="closeMenu()" style="margin-top: 40px; border: none; background: none; color: #888;">CLOSE</button>
+</div>
 
 <script>
   const canvas = document.getElementById('canvas');
+  const menu = document.getElementById('menu');
   const hint = document.getElementById('hint');
 
   let state = {
-    split: 50,      // X axis (0-100)
-    warmth: 255,    // Y axis (Blue component)
-    softness: 0,    // Pinch (0-40)
-    initialDist: 0  // For pinch math
+    split: 50, warmth: 255, softness: 0,
+    mode: 'white', isPulsing: false, pulseVal: 1
   };
 
+  // --- CORE INTERACTION ---
   function updateDisplay() {
-    // Calculate Warmth Color
-    const r = 255;
-    const g = Math.max(180, state.warmth);
-    const b = state.warmth;
-    const lightColor = `rgb(${r}, ${g}, ${b})`;
-
-    // Create the gradient string
-    // Softness defines how far apart the Black and Light colors are
-    const edge1 = state.split - state.softness;
-    const edge2 = state.split + state.softness;
-
-    canvas.style.background = `linear-gradient(to right, #000 ${edge1}%, ${lightColor} ${edge2}%)`;
-  }
-
-  function handleTouch(e) {
-    hint.style.opacity = 0;
-
-    if (e.touches.length === 1) {
-      // SINGLE TOUCH: Move Split and Warmth
-      const touch = e.touches[0];
-      state.split = (touch.clientX / window.innerWidth) * 100;
-
-      // Vertical move changes blue channel (255 = white, 0 = orange)
-      state.warmth = (touch.clientY / window.innerHeight) * 255;
-
-    } else if (e.touches.length === 2) {
-      // MULTI TOUCH: Pinch for Softness
-      const dX = e.touches[0].clientX - e.touches[1].clientX;
-      const dY = e.touches[0].clientY - e.touches[1].clientY;
-      const dist = Math.sqrt(dX * dX + dY * dY);
-
-      if (state.initialDist === 0) {
-        state.initialDist = dist;
-      } else {
-        // Adjust softness based on change in distance
-        const diff = (dist - state.initialDist) / 10;
-        state.softness = Math.max(0, Math.min(40, state.softness + diff));
-        state.initialDist = dist;
-      }
+    let color;
+    if (state.mode === 'white') {
+      color = `rgb(255, ${Math.max(180, state.warmth)}, ${state.warmth})`;
+    } else if (state.mode === 'red') {
+      color = `rgb(${state.warmth}, 0, 0)`;
+    } else if (state.mode === 'blue') {
+      color = `rgb(0, 0, ${state.warmth})`;
+    } else if (state.mode === 'green') {
+      color = `rgb(0, ${state.warmth}, 0)`;
     }
-    updateDisplay();
+
+    // Apply Pulse
+    if (state.isPulsing) {
+      canvas.style.opacity = state.pulseVal;
+    } else {
+      canvas.style.opacity = 1;
+    }
+
+    document.documentElement.style.setProperty('--light-color', color);
+    document.documentElement.style.setProperty('--split', state.split + '%');
+    document.documentElement.style.setProperty('--softness', state.softness + '%');
   }
 
+  // --- GESTURES ---
+  let pressTimer;
   window.addEventListener('touchstart', (e) => {
+    pressTimer = setTimeout(() => { menu.style.display = 'flex'; }, 800);
+  });
+
+  window.addEventListener('touchmove', (e) => {
+    clearTimeout(pressTimer);
+    if (menu.style.display === 'flex') return;
+
+    const touch = e.touches[0];
+    state.split = (touch.clientX / window.innerWidth) * 100;
+    state.warmth = (touch.clientY / window.innerHeight) * 255;
+
     if (e.touches.length === 2) {
       const dX = e.touches[0].clientX - e.touches[1].clientX;
       const dY = e.touches[0].clientY - e.touches[1].clientY;
-      state.initialDist = Math.sqrt(dX * dX + dY * dY);
+      state.softness = Math.min(45, Math.sqrt(dX*dX + dY*dY) / 10);
     }
+    updateDisplay();
+    hint.style.opacity = 0;
   });
 
-  window.addEventListener('touchmove', handleTouch, { passive: false });
-  window.addEventListener('touchend', () => { state.initialDist = 0; });
+  window.addEventListener('touchend', () => clearTimeout(pressTimer));
 
-  // Run once to set initial view
-  updateDisplay();
+  // --- PRO FEATURES ---
+  function setMode(m) {
+    state.mode = m;
+    document.querySelectorAll('.btn-group button').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+    updateDisplay();
+  }
+
+  function togglePulse() {
+    state.isPulsing = !state.isPulsing;
+    document.getElementById('btn-pulse').innerText = state.isPulsing ? "PULSE: ON" : "PULSE: OFF";
+    if (state.isPulsing) runPulse();
+  }
+
+  function runPulse() {
+    if (!state.isPulsing) return;
+    state.pulseVal = state.pulseVal === 1 ? 0.2 : 1;
+    updateDisplay();
+    setTimeout(runPulse, 600);
+  }
+
+  function closeMenu() { menu.style.display = 'none'; }
 </script>
 </body>
 </html>
