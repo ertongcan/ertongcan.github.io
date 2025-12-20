@@ -101,7 +101,6 @@ let effectInterval = null;
 let currentSpeed = 500; // milliseconds
 let effectMode = 'none'; // 'none', 'pulse', or 'strobe'
 
-setMode("white")
 btnWhite.addEventListener("click", () => {
     setMode('white');
 });
