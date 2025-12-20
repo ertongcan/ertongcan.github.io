@@ -8,6 +8,7 @@ const btnClose = document.getElementById('btn-close');
 const btnSteady = document.getElementById('fx-none');
 const btnPulse = document.getElementById('fx-pulse');
 const btnStrobe = document.getElementById('fx-strobe');
+const inpSpeed = document.getElementById('inp-speed');
 
 let state = {
     split: 50, warmth: 255, softness: 0,
@@ -108,6 +109,14 @@ let effectInterval = null;
 let currentSpeed = 500; // milliseconds
 let effectMode = 'none'; // 'none', 'pulse', or 'strobe'
 
+inpSpeed.addEventListener("input", (evt) => {
+    const val = evt.target.value;
+
+    document.getElementById('speed-label').innerText = `SPEED: ${parseInt(val)}ms`;
+
+    // Restart effect to apply new speed immediately
+    setEffect(effectMode);
+});
 btnWhite.addEventListener("click", (evt) => {
     setMode('white', evt);
 });
@@ -155,14 +164,6 @@ btnStrobe.addEventListener("click",  () => {
 btnPulse.addEventListener("click",  () => {
     setEffect("pulse");
 });
-
-function updateSpeed(val) {
-    currentSpeed = val;
-    document.getElementById('speed-label').innerText = `SPEED: ${val}ms`;
-
-    // Restart effect to apply new speed immediately
-    setEffect(effectMode);
-}
 
 function runPulse() {
     // Pulse is a soft CSS transition
