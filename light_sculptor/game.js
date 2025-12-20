@@ -1,6 +1,11 @@
-    const canvas = document.getElementById('canvas');
-    const menu = document.getElementById('menu');
-    const hint = document.getElementById('hint');
+import {rewardVideo} from "../admob";
+
+const canvas = document.getElementById('canvas');
+const menu = document.getElementById('menu');
+const btnWhite = document.getElementById('btn-white');
+const btnRed = document.getElementById('btn-red');
+const btnGreen = document.getElementById('btn-green');
+const btnBlue = document.getElementById('btn-blue');
 
     let state = {
     split: 50, warmth: 255, softness: 0,
@@ -36,7 +41,7 @@
     // --- GESTURES ---
     let pressTimer;
     const TRIGGER_ZONE = 60;
-    window.addEventListener('touchstart', (e) => {
+window.addEventListener('touchstart', (e) => {
 
     //menu.style.display = 'flex';
     const touch = e.touches[0];
@@ -62,7 +67,7 @@
 
 });
 
-    window.addEventListener('touchmove', (e) => {
+window.addEventListener('touchmove', (e) => {
     // clearTimeout(pressTimer);
     if (menu.style.display === 'flex') return;
     e.preventDefault();
@@ -71,16 +76,16 @@
     state.warmth = (touch.clientY / window.innerHeight) * 255;
 
     if (e.touches.length === 2) {
-    const dX = e.touches[0].clientX - e.touches[1].clientX;
-    const dY = e.touches[0].clientY - e.touches[1].clientY;
-    const currentDist = Math.sqrt(dX * dX + dY * dY);
-    // Calculate change in distance
-    const sensitivity = 0.15;
-    const delta = (currentDist - state.initialPinchDist) * sensitivity;
+        const dX = e.touches[0].clientX - e.touches[1].clientX;
+        const dY = e.touches[0].clientY - e.touches[1].clientY;
+        const currentDist = Math.sqrt(dX * dX + dY * dY);
+        // Calculate change in distance
+        const sensitivity = 0.15;
+        const delta = (currentDist - state.initialPinchDist) * sensitivity;
 
-    state.softness = Math.max(0, Math.min(45, state.softness + delta));
-    state.initialPinchDist = currentDist; // Reset for smooth scaling
-}
+        state.softness = Math.max(0, Math.min(45, state.softness + delta));
+        state.initialPinchDist = currentDist; // Reset for smooth scaling
+    }
     updateDisplay();
     hint.style.opacity = 0;
 });
@@ -88,18 +93,33 @@
     // window.addEventListener('touchend', () => clearTimeout(pressTimer));
 
     // --- PRO FEATURES ---
-    function setMode(m) {
+function setMode(m) {
     state.mode = m;
     document.querySelectorAll('.btn-group button').forEach(b => b.classList.remove('active'));
     event.target.classList.add('active');
     updateDisplay();
 }
 
-    let effectInterval = null;
-    let currentSpeed = 500; // milliseconds
-    let effectMode = 'none'; // 'none', 'pulse', or 'strobe'
+let effectInterval = null;
+let currentSpeed = 500; // milliseconds
+let effectMode = 'none'; // 'none', 'pulse', or 'strobe'
 
-    function setEffect(mode) {
+btnWhite.addEventListener("click", async () => {
+    setMode('white');
+});
+
+btnGreen.addEventListener("click", async () => {
+    setMode('green');
+});
+
+btnRed.addEventListener("click", async () => {
+    setMode('red');
+});
+
+btnBlue.addEventListener("click", async () => {
+    setMode('blue');
+});
+function setEffect(mode) {
     effectMode = mode;
 
     // UI Update
@@ -114,10 +134,10 @@
     canvas.style.opacity = 1; // Reset opacity
 
     if (mode === 'pulse') {
-    runPulse();
-} else if (mode === 'strobe') {
-    runStrobe();
-}
+        runPulse();
+    } else if (mode === 'strobe') {
+        runStrobe();
+    }
 }
 
     function updateSpeed(val) {
@@ -153,11 +173,3 @@ function runStrobe() {
 
 
 function closeMenu() { menu.style.display = 'none'; }
-
-window.closeMenu = closeMenu();
-window.runStrobe = runStrobe();
-window.setEffect = setEffect();
-window.updateSpeed = updateSpeed();
-window.setMode = setMode();
-window.updateDisplay = updateDisplay();
-window.runPulse = runPulse();
