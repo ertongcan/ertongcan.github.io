@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>LUME PRO</title>
+  <title>Light Sculptor</title>
   <style>
     :root { --light-color: rgb(255, 255, 255); --softness: 0%; --split: 50%; }
     body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; touch-action: none; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
@@ -53,9 +53,16 @@
   <div class="menu-row">
     <div>EFFECTS</div>
     <div class="btn-group">
-      <button onclick="togglePulse()" id="btn-pulse">PULSE: OFF</button>
+        <button onclick="setEffect('none')" id="fx-none" class="active">STEADY</button>
+        <button onclick="setEffect('pulse')" id="fx-pulse">PULSE</button>
+        <button onclick="setEffect('strobe')" id="fx-strobe">STROBE</button>
     </div>
-  </div>
+    </div>
+    <div class="menu-row" id="speed-control" style="display:none;">
+        <div id="speed-label">SPEED: 500ms</div>
+        <input type="range" min="20" max="2000" value="500" step="10"
+               oninput="updateSpeed(this.value)" style="width: 200px; margin-top:10px;">
+    </div>
   <button onclick="closeMenu()" style="margin-top: 40px; border: none; background: none; color: #888;">CLOSE</button>
 </div>
 
@@ -157,17 +164,60 @@ window.addEventListener('touchmove', (e) => {
     updateDisplay();
   }
 
-  function togglePulse() {
-    state.isPulsing = !state.isPulsing;
-    document.getElementById('btn-pulse').innerText = state.isPulsing ? "PULSE: ON" : "PULSE: OFF";
-    if (state.isPulsing) runPulse();
+  let effectInterval = null;
+  let currentSpeed = 500; // milliseconds
+  let effectMode = 'none'; // 'none', 'pulse', or 'strobe'
+
+  function setEffect(mode) {
+      effectMode = mode;
+
+      // UI Update
+      document.querySelectorAll('[id^="fx-"]').forEach(b => b.classList.remove('active'));
+      document.getElementById(`fx-${mode}`).classList.add('active');
+
+      // Show/Hide speed slider
+      document.getElementById('speed-control').style.display = (mode === 'none') ? 'none' : 'block';
+
+      // Clear previous interval
+      if (effectInterval) clearInterval(effectInterval);
+      canvas.style.opacity = 1; // Reset opacity
+
+      if (mode === 'pulse') {
+          runPulse();
+      } else if (mode === 'strobe') {
+          runStrobe();
+      }
+  }
+
+  function updateSpeed(val) {
+      currentSpeed = val;
+      document.getElementById('speed-label').innerText = `SPEED: ${val}ms`;
+
+      // Restart effect to apply new speed immediately
+      setEffect(effectMode);
   }
 
   function runPulse() {
-    if (!state.isPulsing) return;
-    state.pulseVal = state.pulseVal === 1 ? 0.2 : 1;
-    updateDisplay();
-    setTimeout(runPulse, 600);
+      // Pulse is a soft CSS transition
+      canvas.style.transition = `opacity ${currentSpeed}ms ease-in-out`;
+      let toggle = false;
+
+      effectInterval = setInterval(() => {
+          canvas.style.opacity = toggle ? 1 : 0.1;
+          toggle = !toggle;
+      }, currentSpeed);
+  }
+
+  function runStrobe() {
+      // Strobe is a sharp cut (no transition)
+      canvas.style.transition = 'none';
+
+      effectInterval = setInterval(() => {
+          canvas.style.opacity = 0; // Flash Off
+          setTimeout(() => {
+              canvas.style.opacity = 1; // Flash On
+          }, 10); // 10ms "On" time creates a sharp frozen-motion effect
+      }, currentSpeed);
   }
 
   function closeMenu() { menu.style.display = 'none'; }
