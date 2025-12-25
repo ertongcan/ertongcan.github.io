@@ -1,5 +1,31 @@
 import { FaceMesh } from "@mediapipe/face_mesh";
 
+function checkBilateralDepth(landmarks) {
+    const anchor = landmarks[168]; // Nose Bridge
+    const leftEye = landmarks[133];
+    const rightEye = landmarks[362];
+
+    // Calculate 3D Euclidean Distance: sqrt(dx² + dy² + dz²)
+    const get3DDist = (p1, p2) => Math.sqrt(
+        Math.pow(p1.x - p2.x, 2) +
+        Math.pow(p1.y - p2.y, 2) +
+        Math.pow(p1.z - p2.z, 2)
+    );
+
+    const distL = get3DDist(anchor, leftEye);
+    const distR = get3DDist(anchor, rightEye);
+
+    // The "Imbalance Score" is the percentage difference
+    const imbalance = Math.abs(distL - distR) / ((distL + distR) / 2);
+
+    // Threshold: Real human faces (even with tilt) usually stay under 0.05
+    // Deepfakes or bad AI swaps often spike above 0.12
+    return {
+        score: imbalance,
+        isSuspect: imbalance > 0.08
+    };
+}
+
 const faceMesh = new FaceMesh({
     locateFile: (f) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${f}`
 });
@@ -15,40 +41,12 @@ faceMesh.onResults(results => {
     if (resolveResult) resolveResult(results);
 });
 
-// Single Image Analysis Logic
-function analyzeSingleImage(landmarks) {
-    // Anchor: Nose Bridge (168)
-    const anchor = landmarks[168];
-
-    console.log("anchor",anchor);
-
-    // Measure Symmetry: Distance from nose to inner eye corners
-    const leftEye = landmarks[133];
-    const rightEye = landmarks[362];
-
-    const distL = Math.hypot(leftEye.x - anchor.x, leftEye.y - anchor.y);
-    const distR = Math.hypot(rightEye.x - anchor.x, rightEye.y - anchor.y);
-
-    // Structural Ratio: How much the left/right balance deviates
-    const symmetryError = Math.abs(distL - distR);
-
-    // Verdict: Deepfakes often have "warped" symmetry in static photos
-    // A threshold over 0.015 usually indicates head tilt OR AI distortion
-    const isSuspect = symmetryError > 0.015;
-
-    return {
-        score: (symmetryError * 1000).toFixed(2),
-        verdict: isSuspect ? "SUSPECT (Geometric Anomaly)" : "LIKELY GENUINE"
-    };
-}
-
 document.getElementById("files").onchange = async (e) => {
-    const file = e.target.files[0]; // Take only the first photo
+    const file = e.target.files[0];
     if (!file) return;
 
-    const url = URL.createObjectURL(file);
     const img = new Image();
-    img.src = url;
+    img.src = URL.createObjectURL(file);
     await img.decode();
 
     const results = await new Promise(resolve => {
@@ -56,18 +54,17 @@ document.getElementById("files").onchange = async (e) => {
         faceMesh.send({ image: img });
     });
 
-    const outputDiv = document.getElementById("out");
+    const out = document.getElementById("out");
     if (results.multiFaceLandmarks?.length) {
-        const analysis = analyzeSingleImage(results.multiFaceLandmarks[0]);
-        outputDiv.innerHTML = `
-            <h3 style="color: ${analysis.verdict.includes('SUSPECT') ? '#ff4444' : '#44ff44'}">
-                ${analysis.verdict}
-            </h3>
-            <p>Symmetry Error: ${analysis.score}</p>
+        const forensic = checkBilateralDepth(results.multiFaceLandmarks[0]);
+
+        out.innerHTML = `
+            <div style="color: ${forensic.isSuspect ? '#ff4444' : '#00ff88'}">
+                <h3>${forensic.isSuspect ? '⚠️ SUSPECT GEOMETRY' : '✅ GEOMETRY STABLE'}</h3>
+                <p>Depth Imbalance: ${(forensic.score * 100).toFixed(2)}%</p>
+            </div>
         `;
     } else {
-        outputDiv.innerHTML = "No face detected in this image.";
+        out.innerText = "No face detected.";
     }
-
-    URL.revokeObjectURL(url);
 };

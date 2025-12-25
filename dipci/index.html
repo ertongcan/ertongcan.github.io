@@ -1,32 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deepfake Forensic Analyzer</title>
-    <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #121212; color: #e0e0e0; padding: 2rem; }
-        .container { max-width: 800px; margin: 0 auto; }
-        .upload-box { border: 2px dashed #444; padding: 2rem; text-align: center; border-radius: 8px; cursor: pointer; transition: 0.3s; }
-        .upload-box:hover { border-color: #00ff88; background: #1a1a1a; }
-        #out { margin-top: 2rem; background: #1a1a1a; padding: 1rem; border-radius: 8px; font-family: monospace; white-space: pre-wrap; }
-        .result-item { border-bottom: 1px solid #333; padding: 10px 0; display: flex; justify-content: space-between; }
-        .fake { color: #ff4444; font-weight: bold; }
-        .genuine { color: #44ff44; font-weight: bold; }
-    </style>
-</head>
-<body>
-<div class="container">
-    <h1>Forensic Geometry Analyzer</h1>
-    <p>Upload multiple frames from a video to detect structural drift artifacts.</p>
-
-    <div class="upload-box" onclick="document.getElementById('files').click()">
-        <p>Click to select multiple images</p>
-        <input type="file" id="files" multiple accept="image/*" style="display:none">
-    </div>
-
-    <div id="out">Results will appear here...</div>
-</div>
-<script src="./bundle.js"></script>
+<body style="background: #111; color: #fff; font-family: sans-serif; padding: 20px;">
+<h2>Bilateral Depth Analyzer</h2>
+<input type="file" id="files" accept="image/*">
+<div id="out" style="margin-top: 20px; font-weight: bold;">Upload a photo...</div>
 </body>
-</html>

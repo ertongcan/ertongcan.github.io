@@ -250,6 +250,40 @@ faceMesh.setOptions({
     refineLandmarks: true
 });
 
+function poseInvariantSymmetry(landmarks) {
+    const anchor = landmarks[168]; // Nose bridge (stable)
+
+    // Symmetric Pairs: [Left Index, Right Index]
+    const pairs = [[33, 263], [133, 362], [61, 291]];
+    let totalError = 0;
+
+    for (const [L, R] of pairs) {
+        const left = landmarks[L];
+        const right = landmarks[R];
+
+        // 3D Euclidean Distance from Anchor
+        // Math.sqrt(dx² + dy² + dz²)
+        const distL = Math.sqrt(
+            Math.pow(left.x - anchor.x, 2) +
+            Math.pow(left.y - anchor.y, 2) +
+            Math.pow(left.z - anchor.z, 2)
+        );
+
+        const distR = Math.sqrt(
+            Math.pow(right.x - anchor.x, 2) +
+            Math.pow(right.y - anchor.y, 2) +
+            Math.pow(right.z - anchor.z, 2)
+        );
+
+        // Instead of absolute difference, we use a ratio or normalized difference
+        // This makes it less sensitive to the person's distance from the camera
+        const error = Math.abs(distL - distR) / ((distL + distR) / 2);
+        totalError += error;
+    }
+
+    return totalError / pairs.length;
+}
+
 let resolveResult = null;
 faceMesh.onResults(results => {
     if (resolveResult) resolveResult(results);
@@ -298,13 +332,14 @@ document.getElementById("files").onchange = async (e) => {
 
     const outputDiv = document.getElementById("out");
     if (results.multiFaceLandmarks?.length) {
-        const analysis = analyzeSingleImage(results.multiFaceLandmarks[0]);
-        outputDiv.innerHTML = `
+        const analysis = poseInvariantSymmetry(results.multiFaceLandmarks[0]);
+        /*outputDiv.innerHTML = `
             <h3 style="color: ${analysis.verdict.includes('SUSPECT') ? '#ff4444' : '#44ff44'}">
                 ${analysis.verdict}
             </h3>
             <p>Symmetry Error: ${analysis.score}</p>
-        `;
+        `;*/
+        outputDiv.innerHTML = analysis;
     } else {
         outputDiv.innerHTML = "No face detected in this image.";
     }
