@@ -245,7 +245,7 @@ const faceMesh = new _mediapipe_face_mesh__WEBPACK_IMPORTED_MODULE_0__.FaceMesh(
 });
 
 faceMesh.setOptions({
-    staticImageMode: true, // Optimized for individual files
+    staticImageMode: true,
     maxNumFaces: 1,
     refineLandmarks: true
 });
@@ -255,7 +255,35 @@ faceMesh.onResults(results => {
     if (resolveResult) resolveResult(results);
 });
 
-async function processImage(file) {
+// Single Image Analysis Logic
+function analyzeSingleImage(landmarks) {
+    // Anchor: Nose Bridge (168)
+    const anchor = landmarks[168];
+
+    // Measure Symmetry: Distance from nose to inner eye corners
+    const leftEye = landmarks[133];
+    const rightEye = landmarks[362];
+
+    const distL = Math.hypot(leftEye.x - anchor.x, leftEye.y - anchor.y);
+    const distR = Math.hypot(rightEye.x - anchor.x, rightEye.y - anchor.y);
+
+    // Structural Ratio: How much the left/right balance deviates
+    const symmetryError = Math.abs(distL - distR);
+
+    // Verdict: Deepfakes often have "warped" symmetry in static photos
+    // A threshold over 0.015 usually indicates head tilt OR AI distortion
+    const isSuspect = symmetryError > 0.015;
+
+    return {
+        score: (symmetryError * 1000).toFixed(2),
+        verdict: isSuspect ? "SUSPECT (Geometric Anomaly)" : "LIKELY GENUINE"
+    };
+}
+
+document.getElementById("files").onchange = async (e) => {
+    const file = e.target.files[0]; // Take only the first photo
+    if (!file) return;
+
     const url = URL.createObjectURL(file);
     const img = new Image();
     img.src = url;
@@ -266,59 +294,20 @@ async function processImage(file) {
         faceMesh.send({ image: img });
     });
 
-    URL.revokeObjectURL(url);
-    return results.multiFaceLandmarks?.[0] || null;
-}
-
-// Logic for drift/symmetry
-function analyzeBatch(landmarksArray) {
-    let drifts = [];
-
-    // Compare each frame to the one before it in the selection
-    for (let i = 1; i < landmarksArray.length; i++) {
-        const current = landmarksArray[i];
-        const prev = landmarksArray[i-1];
-
-        const anchor = current[168];
-        const prevAnchor = prev[168];
-        let totalDrift = 0;
-        const checkpoints = [33, 263, 61, 291];
-
-        checkpoints.forEach(idx => {
-            const currentVec = { x: current[idx].x - anchor.x, y: current[idx].y - anchor.y };
-            const prevVec = { x: prev[idx].x - prevAnchor.x, y: prev[idx].y - prevAnchor.y };
-            totalDrift += Math.hypot(currentVec.x - prevVec.x, currentVec.y - prevVec.y);
-        });
-        drifts.push(totalDrift / checkpoints.length);
-    }
-    return drifts;
-}
-
-document.getElementById("files").onchange = async (e) => {
-    const files = Array.from(e.target.files);
     const outputDiv = document.getElementById("out");
-    outputDiv.innerHTML = "Processing frames... please wait.";
-
-    let allLandmarks = [];
-
-    for (const file of files) {
-        const landmarks = await processImage(file);
-        if (landmarks) allLandmarks.push(landmarks);
+    if (results.multiFaceLandmarks?.length) {
+        const analysis = analyzeSingleImage(results.multiFaceLandmarks[0]);
+        outputDiv.innerHTML = `
+            <h3 style="color: ${analysis.verdict.includes('SUSPECT') ? '#ff4444' : '#44ff44'}">
+                ${analysis.verdict}
+            </h3>
+            <p>Symmetry Error: ${analysis.score}</p>
+        `;
+    } else {
+        outputDiv.innerHTML = "No face detected in this image.";
     }
 
-    const drifts = analyzeBatch(allLandmarks);
-    const avgDrift = drifts.length > 0 ? drifts.reduce((a, b) => a + b, 0) / drifts.length : 0;
-    const isFake = avgDrift > 0.004;
-
-    // Final Display Logic
-    outputDiv.innerHTML = `
-        <div style="font-size: 1.2rem; margin-bottom: 1rem;">
-            Verdict: <span class="${isFake ? 'fake' : 'genuine'}">${isFake ? 'DEEPFAKE DETECTED' : 'LIKELY GENUINE'}</span>
-        </div>
-        <div>Avg Structural Drift: ${(avgDrift * 1000).toFixed(4)}</div>
-        <hr>
-        <small>Analyzed ${allLandmarks.length} frames. Higher drift suggests AI-generated temporal instability.</small>
-    `;
+    URL.revokeObjectURL(url);
 };
 
 })();
