@@ -13,8 +13,7 @@ let handLandmarker;
 let lastVideoTime = -1;
 
 let lastPlayed = "";
-let cooldown = false;
-// Audio setup (ensure these files are in your folder)
+
 
 // Add these to your state management at the top
 let isPlaying = false;
