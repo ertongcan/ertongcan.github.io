@@ -19,7 +19,7 @@ faceMesh.onResults(results => {
 function analyzeSingleImage(landmarks) {
     // Anchor: Nose Bridge (168)
     const anchor = landmarks[168];
-    console.log(anchor);
+    console.log(landmarks);
 
     // Measure Symmetry: Distance from nose to inner eye corners
     const leftEye = landmarks[133];
