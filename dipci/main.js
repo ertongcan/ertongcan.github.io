@@ -1,61 +1,60 @@
 const videoElement = document.getElementById('video-input');
-const p1Card = document.getElementById('p1-card');
-const p2Card = document.getElementById('p2-card');
-const p1Score = document.getElementById('p1-score');
-const p2Score = document.getElementById('p2-score');
+const p1ScoreDiv = document.getElementById('p1-score');
+const p2ScoreDiv = document.getElementById('p2-score');
 
-const faceMesh = new FaceMesh({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`});
+const faceMesh = new FaceMesh({locateFile: (file) => {
+        return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
+    }});
 
 faceMesh.setOptions({
-    maxNumFaces: 2, // Crucial for Duel
+    maxNumFaces: 2, // Enable two-player mode
     refineLandmarks: true,
-    minDetectionConfidence: 0.6,
-    minTrackingConfidence: 0.6
+    minDetectionConfidence: 0.5,
+    minTrackingConfidence: 0.5
 });
 
-// Forensic calculation function
-function getForensicScore(face) {
-    const bridge = face[168]; // Nose bridge anchor
-    const eyeL = face[133];   // Inner Left
-    const eyeR = face[362];   // Inner Right
+function calculateImbalance(landmarks) {
+    const anchor = landmarks[168]; // Nose Bridge
+    const L = landmarks[133];      // Left Inner Eye
+    const R = landmarks[362];      // Right Inner Eye
 
-    const dist3D = (a, b) => Math.hypot(a.x-b.x, a.y-b.y, a.z-b.z);
+    const dist3D = (p1, p2) => Math.sqrt(
+        Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2) + Math.pow(p1.z - p2.z, 2)
+    );
 
-    const leftSide = dist3D(bridge, eyeL);
-    const rightSide = dist3D(bridge, eyeR);
+    const dL = dist3D(anchor, L);
+    const dR = dist3D(anchor, R);
 
-    // Calculate percentage difference
-    const ratio = Math.abs(leftSide - rightSide) / ((leftSide + rightSide) / 2);
-    return ratio * 100;
+    // Percent difference (Symmetry Score)
+    return (Math.abs(dL - dR) / ((dL + dR) / 2)) * 100;
 }
 
 faceMesh.onResults(results => {
-    // Clear display if no one is found
-    p1Score.innerText = "--%"; p2Score.innerText = "--%";
-    p1Card.className = "player-card"; p2Card.className = "player-card";
+    // Reset scores if no one is detected
+    p1ScoreDiv.innerText = "--%";
+    p2ScoreDiv.innerText = "--%";
 
-    if (results.multiFaceLandmarks?.length > 0) {
-        // Sort faces by X position so Player 1 is always the left-most person on screen
-        const sortedFaces = [...results.multiFaceLandmarks].sort((a, b) => a[1].x - b[1].x);
+    if (results.multiFaceLandmarks) {
+        results.multiFaceLandmarks.forEach((landmarks, index) => {
+            const score = calculateImbalance(landmarks);
+            const displayScore = score.toFixed(1) + "%";
 
-        sortedFaces.forEach((face, i) => {
-            const imbalance = getForensicScore(face);
-            const scoreText = imbalance.toFixed(1) + "%";
-
-            // Map face to UI (P1 = Left, P2 = Right)
-            if (i === 0) {
-                p1Score.innerText = scoreText;
-                if (imbalance < 6) p1Card.classList.add('winner'); // Threshold for "Very Real"
-            } else if (i === 1) {
-                p2Score.innerText = scoreText;
-                if (imbalance < 6) p2Card.classList.add('winner');
+            if (index === 0) {
+                p1ScoreDiv.innerText = displayScore;
+                document.getElementById('p1-card').classList.toggle('winner', score < 5);
+            } else if (index === 1) {
+                p2ScoreDiv.innerText = displayScore;
+                document.getElementById('p2-card').classList.toggle('winner', score < 5);
             }
         });
     }
 });
 
 const camera = new Camera(videoElement, {
-    onFrame: async () => await faceMesh.send({image: videoElement}),
-    width: 960, height: 540
+    onFrame: async () => {
+        await faceMesh.send({image: videoElement});
+    },
+    width: 1280,
+    height: 720
 });
 camera.start();
