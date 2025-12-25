@@ -40,27 +40,32 @@ const SYMMETRIC_PAIRS = [
     const output = [];
 
     for (const file of e.target.files) {
-    const url = URL.createObjectURL(file);
-    const img = new Image();
-    img.src = url;
-    await img.decode();
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.src = url;
+        await img.decode();
 
-    const results = await processImage(img);
+        const results = await processImage(img);
 
-    if (results.multiFaceLandmarks?.length) {
-    const landmarks = results.multiFaceLandmarks[0];
-    const score = symmetryScore(landmarks);
-    output.push({ file: file.name, symmetry: score });
-} else {
-    output.push({ file: file.name, symmetry: null });
-}
+        if (results.multiFaceLandmarks?.length) {
+            const landmarks = results.multiFaceLandmarks[0];
+            const score = symmetryScore(landmarks);
+            output.push({ file: file.name, symmetry: score });
+        } else {
+            output.push({ file: file.name, symmetry: null });
+        }
 
-    URL.revokeObjectURL(url);
-}
+        URL.revokeObjectURL(url);
+    }
 
     document.getElementById("out").textContent =
     JSON.stringify(output, null, 2);
 };
+
+/**
+ * SYMMETRIC_PAIRS: These indices refer to specific MediaPipe landmarks.
+ * 168 (Nose Bridge) and 6 (Between eyes) define the vertical axis of the face.
+ */
 
 function symmetryScore(landmarks) {
     const mid = faceMidline(landmarks);
@@ -70,7 +75,10 @@ function symmetryScore(landmarks) {
         const left = landmarks[L];
         const right = landmarks[R];
 
+        // 1. Project the left point across the midline to see where it 'should' be
         const mirrored = mirrorPoint(left, mid);
+
+        // 2. Calculate the 'Error Distance' between mirrored point and actual right point
         const d = Math.hypot(
             mirrored.x - right.x,
             mirrored.y - right.y
@@ -79,6 +87,7 @@ function symmetryScore(landmarks) {
         total += d;
     }
 
+    // 3. Return the average error. Lower = More Symmetric.
     return total / SYMMETRIC_PAIRS.length;
 }
 
