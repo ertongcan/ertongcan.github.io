@@ -1,70 +1,61 @@
-import { FaceMesh } from "@mediapipe/face_mesh";
+const videoElement = document.getElementById('video-input');
+const p1Card = document.getElementById('p1-card');
+const p2Card = document.getElementById('p2-card');
+const p1Score = document.getElementById('p1-score');
+const p2Score = document.getElementById('p2-score');
 
-function checkBilateralDepth(landmarks) {
-    const anchor = landmarks[168]; // Nose Bridge
-    const leftEye = landmarks[133];
-    const rightEye = landmarks[362];
-
-    // Calculate 3D Euclidean Distance: sqrt(dx² + dy² + dz²)
-    const get3DDist = (p1, p2) => Math.sqrt(
-        Math.pow(p1.x - p2.x, 2) +
-        Math.pow(p1.y - p2.y, 2) +
-        Math.pow(p1.z - p2.z, 2)
-    );
-
-    const distL = get3DDist(anchor, leftEye);
-    const distR = get3DDist(anchor, rightEye);
-
-    // The "Imbalance Score" is the percentage difference
-    const imbalance = Math.abs(distL - distR) / ((distL + distR) / 2);
-
-    // Threshold: Real human faces (even with tilt) usually stay under 0.05
-    // Deepfakes or bad AI swaps often spike above 0.12
-    return {
-        score: imbalance,
-        isSuspect: imbalance > 0.08
-    };
-}
-
-const faceMesh = new FaceMesh({
-    locateFile: (f) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${f}`
-});
+const faceMesh = new FaceMesh({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`});
 
 faceMesh.setOptions({
-    staticImageMode: true,
-    maxNumFaces: 1,
-    refineLandmarks: true
+    maxNumFaces: 2, // Crucial for Duel
+    refineLandmarks: true,
+    minDetectionConfidence: 0.6,
+    minTrackingConfidence: 0.6
 });
 
-let resolveResult = null;
+// Forensic calculation function
+function getForensicScore(face) {
+    const bridge = face[168]; // Nose bridge anchor
+    const eyeL = face[133];   // Inner Left
+    const eyeR = face[362];   // Inner Right
+
+    const dist3D = (a, b) => Math.hypot(a.x-b.x, a.y-b.y, a.z-b.z);
+
+    const leftSide = dist3D(bridge, eyeL);
+    const rightSide = dist3D(bridge, eyeR);
+
+    // Calculate percentage difference
+    const ratio = Math.abs(leftSide - rightSide) / ((leftSide + rightSide) / 2);
+    return ratio * 100;
+}
+
 faceMesh.onResults(results => {
-    if (resolveResult) resolveResult(results);
+    // Clear display if no one is found
+    p1Score.innerText = "--%"; p2Score.innerText = "--%";
+    p1Card.className = "player-card"; p2Card.className = "player-card";
+
+    if (results.multiFaceLandmarks?.length > 0) {
+        // Sort faces by X position so Player 1 is always the left-most person on screen
+        const sortedFaces = [...results.multiFaceLandmarks].sort((a, b) => a[1].x - b[1].x);
+
+        sortedFaces.forEach((face, i) => {
+            const imbalance = getForensicScore(face);
+            const scoreText = imbalance.toFixed(1) + "%";
+
+            // Map face to UI (P1 = Left, P2 = Right)
+            if (i === 0) {
+                p1Score.innerText = scoreText;
+                if (imbalance < 6) p1Card.classList.add('winner'); // Threshold for "Very Real"
+            } else if (i === 1) {
+                p2Score.innerText = scoreText;
+                if (imbalance < 6) p2Card.classList.add('winner');
+            }
+        });
+    }
 });
 
-document.getElementById("files").onchange = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const img = new Image();
-    img.src = URL.createObjectURL(file);
-    await img.decode();
-
-    const results = await new Promise(resolve => {
-        resolveResult = resolve;
-        faceMesh.send({ image: img });
-    });
-
-    const out = document.getElementById("out");
-    if (results.multiFaceLandmarks?.length) {
-        const forensic = checkBilateralDepth(results.multiFaceLandmarks[0]);
-
-        out.innerHTML = `
-            <div style="color: ${forensic.isSuspect ? '#ff4444' : '#00ff88'}">
-                <h3>${forensic.isSuspect ? '⚠️ SUSPECT GEOMETRY' : '✅ GEOMETRY STABLE'}</h3>
-                <p>Depth Imbalance: ${(forensic.score * 100).toFixed(2)}%</p>
-            </div>
-        `;
-    } else {
-        out.innerText = "No face detected.";
-    }
-};
+const camera = new Camera(videoElement, {
+    onFrame: async () => await faceMesh.send({image: videoElement}),
+    width: 960, height: 540
+});
+camera.start();

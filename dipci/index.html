@@ -1,32 +1,49 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deepfake Forensic Analyzer</title>
+    <meta charset="utf-8">
+    <title>Symmetry Duel: Forensic Challenge</title>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #121212; color: #e0e0e0; padding: 2rem; }
-        .container { max-width: 800px; margin: 0 auto; }
-        .upload-box { border: 2px dashed #444; padding: 2rem; text-align: center; border-radius: 8px; cursor: pointer; transition: 0.3s; }
-        .upload-box:hover { border-color: #00ff88; background: #1a1a1a; }
-        #out { margin-top: 2rem; background: #1a1a1a; padding: 1rem; border-radius: 8px; font-family: monospace; white-space: pre-wrap; }
-        .result-item { border-bottom: 1px solid #333; padding: 10px 0; display: flex; justify-content: space-between; }
-        .fake { color: #ff4444; font-weight: bold; }
-        .genuine { color: #44ff44; font-weight: bold; }
+        body { background: #0f172a; color: white; font-family: 'Segoe UI', sans-serif; margin: 0; overflow: hidden; }
+        .header { text-align: center; padding: 10px; background: #1e293b; border-bottom: 2px solid #334155; }
+        .game-container { position: relative; display: flex; flex-direction: column; align-items: center; }
+
+        #video-input { transform: scaleX(-1); border: 3px solid #334155; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+
+        .scoreboard { display: flex; width: 100%; justify-content: space-around; position: absolute; bottom: 20px; pointer-events: none; }
+        .player-card { background: rgba(30, 41, 59, 0.9); padding: 15px 30px; border-radius: 15px; border: 2px solid #475569; backdrop-filter: blur(5px); min-width: 200px; transition: 0.3s; }
+
+        .score-title { font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; }
+        .score-val { font-size: 3rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+
+        /* Dynamic Winner States */
+        .winner { border-color: #22c55e; box-shadow: 0 0 20px rgba(34, 197, 94, 0.4); transform: scale(1.05); }
+        .winning-text { color: #4ade80; }
     </style>
 </head>
 <body>
-<div class="container">
-    <h1>Forensic Geometry Analyzer</h1>
-    <p>Upload multiple frames from a video to detect structural drift artifacts.</p>
-
-    <div class="upload-box" onclick="document.getElementById('files').click()">
-        <p>Click to select multiple images</p>
-        <input type="file" id="files" multiple accept="image/*" style="display:none">
-    </div>
-
-    <div id="out">Results will appear here...</div>
+<div class="header">
+    <h1>⚔️ SYMMETRY DUEL ⚔️</h1>
+    <p>Maintain the <b>Lowest Imbalance %</b> to prove your 3D geometry is real!</p>
 </div>
-<script src="./bundle.js"></script>
+
+<div class="game-container">
+    <video id="video-input" width="960" height="540" autoplay></video>
+
+    <div class="scoreboard">
+        <div id="p1-card" class="player-card">
+            <div class="score-title">Player 1 (Left)</div>
+            <div id="p1-score" class="score-val">--%</div>
+        </div>
+        <div id="p2-card" class="player-card">
+            <div class="score-title">Player 2 (Right)</div>
+            <div id="p2-score" class="score-val">--%</div>
+        </div>
+    </div>
+</div>
+
+<script src="duel-logic.js"></script>
 </body>
 </html>
