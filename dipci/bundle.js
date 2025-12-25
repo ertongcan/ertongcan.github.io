@@ -395,8 +395,14 @@ const hands = new _mediapipe_hands__WEBPACK_IMPORTED_MODULE_1__.Hands({
     locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
 });
 
+
 faceMesh.setOptions({ maxNumFaces: 1, refineLandmarks: true });
-hands.setOptions({ maxNumHands: 1, minDetectionConfidence: 0.7 });
+hands.setOptions({
+    maxNumHands: 2,
+    modelComplexity: 1,
+    minDetectionConfidence: 0.5,
+    minTrackingConfidence: 0.5
+});
 
 // 2. Shared Data State
 let faceLandmarks = null;
@@ -408,6 +414,7 @@ faceMesh.onResults((results) => {
 
 hands.onResults((results) => {
     handLandmarks = results.multiHandLandmarks?.[0];
+    statusDiv.innerText = "sasasas";
     statusDiv.innerText = handLandmarks;
 });
 
