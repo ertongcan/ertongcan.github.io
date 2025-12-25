@@ -1,5 +1,15 @@
 
 import { FaceMesh } from "@mediapipe/face_mesh";
+
+const SYMMETRIC_PAIRS = [
+    [33, 263],   // outer eye corners
+    [133, 362],  // inner eye corners
+    [159, 386],  // upper eyelids
+    [145, 374],  // lower eyelids
+    [61, 291],   // mouth corners
+    [70, 300],   // cheeks
+];
+
     const faceMesh = new FaceMesh({
     locateFile: f =>
     `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${f}`,
@@ -51,3 +61,50 @@ import { FaceMesh } from "@mediapipe/face_mesh";
     document.getElementById("out").textContent =
     JSON.stringify(output, null, 2);
 };
+
+function symmetryScore(landmarks) {
+    const mid = faceMidline(landmarks);
+    let total = 0;
+
+    for (const [L, R] of SYMMETRIC_PAIRS) {
+        const left = landmarks[L];
+        const right = landmarks[R];
+
+        const mirrored = mirrorPoint(left, mid);
+        const d = Math.hypot(
+            mirrored.x - right.x,
+            mirrored.y - right.y
+        );
+
+        total += d;
+    }
+
+    return total / SYMMETRIC_PAIRS.length;
+}
+
+function mirrorPoint(p, line) {
+    const { x1, y1, x2, y2 } = line;
+
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const a = (dx * dx - dy * dy) / (dx * dx + dy * dy);
+    const b = (2 * dx * dy) / (dx * dx + dy * dy);
+
+    return {
+        x: a * (p.x - x1) + b * (p.y - y1) + x1,
+        y: b * (p.x - x1) - a * (p.y - y1) + y1,
+    };
+}
+
+function faceMidline(landmarks) {
+    const noseTop = landmarks[168];
+    const noseBottom = landmarks[6];
+
+    return {
+        x1: noseTop.x,
+        y1: noseTop.y,
+        x2: noseBottom.x,
+        y2: noseBottom.y,
+    };
+}
+
