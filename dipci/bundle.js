@@ -408,6 +408,7 @@ faceMesh.onResults((results) => {
 
 hands.onResults((results) => {
     handLandmarks = results.multiHandLandmarks?.[0];
+    statusDiv.innerText = handLandmarks;
 });
 
 // 3. The Forensic Detection Loop
