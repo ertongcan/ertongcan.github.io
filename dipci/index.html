@@ -2,36 +2,29 @@
 <html>
 <head>
     <meta charset="utf-8">
+    <title>Forensic Symmetry Live</title>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
     <style>
-        body { background: #0a0a0a; color: white; font-family: 'Inter', sans-serif; text-align: center; }
-        .container { position: relative; width: 1280px; margin: auto; }
-        #video-input { transform: scaleX(-1); border-radius: 15px; border: 4px solid #333; }
-        .scoreboard { display: flex; justify-content: space-around; margin-top: 20px; }
-        .player-card { padding: 20px; border-radius: 10px; min-width: 250px; background: #1a1a1a; border: 2px solid #444; }
-        .score-val { font-size: 2.5rem; font-weight: bold; }
-        .label { color: #888; text-transform: uppercase; letter-spacing: 1px; }
-        .winner { border-color: #00ff88; box-shadow: 0 0 20px rgba(0, 255, 136, 0.3); }
+        body { background: #0f172a; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; margin: 0; padding: 20px; }
+        .vid-container { position: relative; border-radius: 20px; overflow: hidden; border: 4px solid #334155; }
+        #video-input { transform: scaleX(-1); width: 800px; height: auto; }
+        .stats { margin-top: 20px; background: #1e293b; padding: 20px; border-radius: 15px; width: 400px; text-align: center; }
+        #score-display { font-size: 3.5rem; font-weight: 900; color: #22c55e; }
+        .verdict { margin-top: 10px; font-weight: bold; letter-spacing: 1px; }
     </style>
 </head>
 <body>
-<h1>SYMMETRY DUEL: 3D FORENSICS</h1>
-<div class="container">
-    <video id="video-input" width="1280" height="720" autoplay></video>
+<h1>SYMMETRY ANALYZER</h1>
+<div class="vid-container">
+    <video id="video-input" autoplay></video>
 </div>
 
-<div class="scoreboard">
-    <div id="p1-card" class="player-card">
-        <div class="label">Player 1 Imbalance</div>
-        <div id="p1-score" class="score-val">--%</div>
-    </div>
-    <div id="p2-card" class="player-card">
-        <div class="label">Player 2 Imbalance</div>
-        <div id="p2-score" class="score-val">--%</div>
-    </div>
+<div class="stats">
+    <div id="score-display">--%</div>
+    <div class="verdict" id="status-text">WAITING FOR FACE...</div>
 </div>
 
-<script src="main.js"></script>
+<script src="bundle.js"></script>
 </body>
 </html>
