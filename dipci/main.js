@@ -1,119 +1,82 @@
-
 import { FaceMesh } from "@mediapipe/face_mesh";
 
-const SYMMETRIC_PAIRS = [
-    [33, 263],   // outer eye corners
-    [133, 362],  // inner eye corners
-    [159, 386],  // upper eyelids
-    [145, 374],  // lower eyelids
-    [61, 291],   // mouth corners
-    [70, 300],   // cheeks
-];
-
-    const faceMesh = new FaceMesh({
-    locateFile: f =>
-    `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${f}`,
+const faceMesh = new FaceMesh({
+    locateFile: (f) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${f}`
 });
 
-    faceMesh.setOptions({
-    staticImageMode: true,
+faceMesh.setOptions({
+    staticImageMode: true, // Optimized for individual files
     maxNumFaces: 1,
-    refineLandmarks: true,
+    refineLandmarks: true
 });
 
-    let pendingResolve = null;
-
-    faceMesh.onResults(results => {
-    if (!pendingResolve) return;
-    pendingResolve(results);
-    pendingResolve = null;
+let resolveResult = null;
+faceMesh.onResults(results => {
+    if (resolveResult) resolveResult(results);
 });
 
-    async function processImage(img) {
-    return new Promise(resolve => {
-    pendingResolve = resolve;
-    faceMesh.send({ image: img });
-});
+async function processImage(file) {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.src = url;
+    await img.decode();
+
+    const results = await new Promise(resolve => {
+        resolveResult = resolve;
+        faceMesh.send({ image: img });
+    });
+
+    URL.revokeObjectURL(url);
+    return results.multiFaceLandmarks?.[0] || null;
 }
 
-    document.getElementById("files").onchange = async e => {
-    const output = [];
+// Logic for drift/symmetry
+function analyzeBatch(landmarksArray) {
+    let drifts = [];
 
-    for (const file of e.target.files) {
-        const url = URL.createObjectURL(file);
-        const img = new Image();
-        img.src = url;
-        await img.decode();
+    // Compare each frame to the one before it in the selection
+    for (let i = 1; i < landmarksArray.length; i++) {
+        const current = landmarksArray[i];
+        const prev = landmarksArray[i-1];
 
-        const results = await processImage(img);
+        const anchor = current[168];
+        const prevAnchor = prev[168];
+        let totalDrift = 0;
+        const checkpoints = [33, 263, 61, 291];
 
-        if (results.multiFaceLandmarks?.length) {
-            const landmarks = results.multiFaceLandmarks[0];
-            const score = symmetryScore(landmarks);
-            output.push({ file: file.name, symmetry: score });
-        } else {
-            output.push({ file: file.name, symmetry: null });
-        }
+        checkpoints.forEach(idx => {
+            const currentVec = { x: current[idx].x - anchor.x, y: current[idx].y - anchor.y };
+            const prevVec = { x: prev[idx].x - prevAnchor.x, y: prev[idx].y - prevAnchor.y };
+            totalDrift += Math.hypot(currentVec.x - prevVec.x, currentVec.y - prevVec.y);
+        });
+        drifts.push(totalDrift / checkpoints.length);
+    }
+    return drifts;
+}
 
-        URL.revokeObjectURL(url);
+document.getElementById("files").onchange = async (e) => {
+    const files = Array.from(e.target.files);
+    const outputDiv = document.getElementById("out");
+    outputDiv.innerHTML = "Processing frames... please wait.";
+
+    let allLandmarks = [];
+
+    for (const file of files) {
+        const landmarks = await processImage(file);
+        if (landmarks) allLandmarks.push(landmarks);
     }
 
-    document.getElementById("out").textContent =
-    JSON.stringify(output, null, 2);
+    const drifts = analyzeBatch(allLandmarks);
+    const avgDrift = drifts.length > 0 ? drifts.reduce((a, b) => a + b, 0) / drifts.length : 0;
+    const isFake = avgDrift > 0.004;
+
+    // Final Display Logic
+    outputDiv.innerHTML = `
+        <div style="font-size: 1.2rem; margin-bottom: 1rem;">
+            Verdict: <span class="${isFake ? 'fake' : 'genuine'}">${isFake ? 'DEEPFAKE DETECTED' : 'LIKELY GENUINE'}</span>
+        </div>
+        <div>Avg Structural Drift: ${(avgDrift * 1000).toFixed(4)}</div>
+        <hr>
+        <small>Analyzed ${allLandmarks.length} frames. Higher drift suggests AI-generated temporal instability.</small>
+    `;
 };
-
-/**
- * SYMMETRIC_PAIRS: These indices refer to specific MediaPipe landmarks.
- * 168 (Nose Bridge) and 6 (Between eyes) define the vertical axis of the face.
- */
-
-function symmetryScore(landmarks) {
-    const mid = faceMidline(landmarks);
-    let total = 0;
-
-    for (const [L, R] of SYMMETRIC_PAIRS) {
-        const left = landmarks[L];
-        const right = landmarks[R];
-
-        // 1. Project the left point across the midline to see where it 'should' be
-        const mirrored = mirrorPoint(left, mid);
-
-        // 2. Calculate the 'Error Distance' between mirrored point and actual right point
-        const d = Math.hypot(
-            mirrored.x - right.x,
-            mirrored.y - right.y
-        );
-
-        total += d;
-    }
-
-    // 3. Return the average error. Lower = More Symmetric.
-    return total / SYMMETRIC_PAIRS.length;
-}
-
-function mirrorPoint(p, line) {
-    const { x1, y1, x2, y2 } = line;
-
-    const dx = x2 - x1;
-    const dy = y2 - y1;
-    const a = (dx * dx - dy * dy) / (dx * dx + dy * dy);
-    const b = (2 * dx * dy) / (dx * dx + dy * dy);
-
-    return {
-        x: a * (p.x - x1) + b * (p.y - y1) + x1,
-        y: b * (p.x - x1) - a * (p.y - y1) + y1,
-    };
-}
-
-function faceMidline(landmarks) {
-    const noseTop = landmarks[168];
-    const noseBottom = landmarks[6];
-
-    return {
-        x1: noseTop.x,
-        y1: noseTop.y,
-        x2: noseBottom.x,
-        y2: noseBottom.y,
-    };
-}
-
