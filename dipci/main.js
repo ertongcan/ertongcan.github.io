@@ -27,6 +27,7 @@ let faceLandmarks = null;
 let handLandmarks = null;
 
 faceMesh.onResults((results) => {
+    statusDiv.innerText = "sasasas";
     faceLandmarks = results.multiFaceLandmarks?.[0];
 });
 
