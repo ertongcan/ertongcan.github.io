@@ -1,78 +1,89 @@
-import { FaceMesh } from "@mediapipe/face_mesh";
-import { Hands } from "@mediapipe/hands";
-import { Camera } from "@mediapipe/camera_utils";
+// Import the modern Task Vision classes
+import {
+    FaceLandmarker,
+    HandLandmarker,
+    FilesetResolver
+} from "@mediapipe/tasks-vision";
 
-const videoElement = document.getElementById('input_video');
-const statusDiv = document.getElementById('status');
+const video = document.getElementById("webcam");
+const statusDiv = document.getElementById("status");
 
-// 1. Initialize Models
-const faceMesh = new FaceMesh({
-    locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
-});
-const hands = new Hands({
-    locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
-});
+let faceLandmarker;
+let handLandmarker;
+let lastVideoTime = -1;
 
+/**
+ * Initialize the "Tasks Vision" models
+ */
+async function initializeModels() {
+    const vision = await FilesetResolver.forVisionTasks(
+        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm"
+    );
 
-faceMesh.setOptions({ maxNumFaces: 1, refineLandmarks: true });
-hands.setOptions({
-    maxNumHands: 2,
-    modelComplexity: 1,
-    minDetectionConfidence: 0.5,
-    minTrackingConfidence: 0.5
-});
+    // Initialize Face Landmarker (The modern FaceMesh)
+    faceLandmarker = await FaceLandmarker.createFromOptions(vision, {
+        baseOptions: {
+            modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task`,
+            delegate: "GPU"
+        },
+        runningMode: "VIDEO"
+    });
 
-// 2. Shared Data State
-let faceLandmarks = null;
-let handLandmarks = null;
+    // Initialize Hand Landmarker
+    handLandmarker = await HandLandmarker.createFromOptions(vision, {
+        baseOptions: {
+            modelAssetPath: `https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task`,
+            delegate: "GPU"
+        },
+        runningMode: "VIDEO",
+        numHands: 1
+    });
 
-faceMesh.onResults((results) => {
-    statusDiv.innerText = "sasasas";
-    faceLandmarks = results.multiFaceLandmarks?.[0];
-});
-
-hands.onResults((results) => {
-    handLandmarks = results.multiHandLandmarks?.[0];
-    statusDiv.innerText = "sasasas";
-    statusDiv.innerText = handLandmarks;
-});
-
-// 3. The Forensic Detection Loop
-function checkProximity() {
-    if (faceLandmarks && handLandmarks) {
-        const noseTip = faceLandmarks[1];        // Index 1: Nose Tip
-        const indexTip = handLandmarks[8];       // Index 8: Index Finger Tip
-
-        // 3D Distance Calculation
-        const distance = Math.sqrt(
-            Math.pow(noseTip.x - indexTip.x, 2) +
-            Math.pow(noseTip.y - indexTip.y, 2) +
-            Math.pow(noseTip.z - indexTip.z, 2)
-        );
-
-        // Threshold: 0.07 is usually the "sweet spot" for a touch
-        if (distance < 0.07) {
-            statusDiv.innerText = "👃 NOSE TOUCHED!";
-            statusDiv.classList.add('success');
-        } else {
-            statusDiv.innerText = "Target: Your Nose";
-            statusDiv.classList.remove('success');
-        }
-    } else {
-        statusDiv.innerText = "Show your face and hand";
-    }
+    statusDiv.innerText = "Models Ready!";
+    startLoop();
 }
 
-// 4. Integrated Camera Loop
-const camera = new Camera(videoElement, {
-    onFrame: async () => {
-        // Process both in the same frame
-        await faceMesh.send({image: videoElement});
-        await hands.send({image: videoElement});
-        checkProximity();
-    },
-    width: 640,
-    height: 480
-});
+/**
+ * The Detection Loop for Nose-Touch Logic
+ */
+async function predict() {
+    const startTimeMs = performance.now();
 
-camera.start();
+    if (video.currentTime !== lastVideoTime) {
+        lastVideoTime = video.currentTime;
+
+        const faceRes = faceLandmarker.detectForVideo(video, startTimeMs);
+        const handRes = handLandmarker.detectForVideo(video, startTimeMs);
+
+        if (faceRes.faceLandmarks?.[0] && handRes.landmarks?.[0]) {
+            const nose = faceRes.faceLandmarks[0][1]; // Index 1: Nose Tip
+            const finger = handRes.landmarks[0][8];   // Index 8: Index Finger Tip
+
+            // Math: 3D Euclidean distance
+            const distance = Math.hypot(
+                nose.x - finger.x,
+                nose.y - finger.y,
+                nose.z - finger.z
+            );
+
+            // Threshold check (0.07 is ideal for 'touching')
+            if (distance < 0.07) {
+                statusDiv.innerText = "👃 NOSE TOUCHED!";
+                statusDiv.style.color = "yellow";
+            } else {
+                statusDiv.innerText = "Target: Your Nose";
+                statusDiv.style.color = "white";
+            }
+        }
+    }
+    requestAnimationFrame(predict);
+}
+
+function startLoop() {
+    navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
+        video.srcObject = stream;
+        video.addEventListener("loadeddata", predict);
+    });
+}
+
+initializeModels();
