@@ -1,60 +1,69 @@
-const videoElement = document.getElementById('video-input');
-const scoreDisplay = document.getElementById('score-display');
-const statusText = document.getElementById('status-text');
+import { FaceMesh } from "@mediapipe/face_mesh";
+import { Hands } from "@mediapipe/hands";
+import { Camera } from "@mediapipe/camera_utils";
 
-// 1. Setup Face Mesh
-const faceMesh = new FaceMesh({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`});
+const videoElement = document.getElementById('input_video');
+const statusDiv = document.getElementById('status');
 
-faceMesh.setOptions({
-    maxNumFaces: 1,
-    refineLandmarks: true,
-    minDetectionConfidence: 0.5,
-    minTrackingConfidence: 0.5
+// 1. Initialize Models
+const faceMesh = new FaceMesh({
+    locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
+});
+const hands = new Hands({
+    locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
 });
 
-// 2. The Symmetry Math
-function calculateSymmetry(landmarks) {
-    const bridge = landmarks[168]; // Stable Anchor
-    const eyeL = landmarks[133];
-    const eyeR = landmarks[362];
+faceMesh.setOptions({ maxNumFaces: 1, refineLandmarks: true });
+hands.setOptions({ maxNumHands: 1, minDetectionConfidence: 0.7 });
 
-    const dist3D = (p1, p2) => Math.sqrt(
-        Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2) + Math.pow(p1.z - p2.z, 2)
-    );
+// 2. Shared Data State
+let faceLandmarks = null;
+let handLandmarks = null;
 
-    const dL = dist3D(bridge, eyeL);
-    const dR = dist3D(bridge, eyeR);
+faceMesh.onResults((results) => {
+    faceLandmarks = results.multiFaceLandmarks?.[0];
+});
 
-    // Percentage of imbalance
-    const imbalance = (Math.abs(dL - dR) / ((dL + dR) / 2)) * 100;
-    return imbalance;
-}
+hands.onResults((results) => {
+    handLandmarks = results.multiHandLandmarks?.[0];
+});
 
-// 3. Handle Results
-faceMesh.onResults(results => {
-    if (results.multiFaceLandmarks?.length > 0) {
-        const score = calculateSymmetry(results.multiFaceLandmarks[0]);
-        scoreDisplay.innerText = score.toFixed(1) + "%";
+// 3. The Forensic Detection Loop
+function checkProximity() {
+    if (faceLandmarks && handLandmarks) {
+        const noseTip = faceLandmarks[1];        // Index 1: Nose Tip
+        const indexTip = handLandmarks[8];       // Index 8: Index Finger Tip
 
-        if (score < 5) {
-            statusText.innerText = "VERDICT: HIGH STABILITY (REAL)";
-            scoreDisplay.style.color = "#22c55e"; // Green
-        } else if (score < 10) {
-            statusText.innerText = "VERDICT: MODERATE ASYMMETRY";
-            scoreDisplay.style.color = "#eab308"; // Yellow
+        // 3D Distance Calculation
+        const distance = Math.sqrt(
+            Math.pow(noseTip.x - indexTip.x, 2) +
+            Math.pow(noseTip.y - indexTip.y, 2) +
+            Math.pow(noseTip.z - indexTip.z, 2)
+        );
+
+        // Threshold: 0.07 is usually the "sweet spot" for a touch
+        if (distance < 0.07) {
+            statusDiv.innerText = "👃 NOSE TOUCHED!";
+            statusDiv.classList.add('success');
         } else {
-            statusText.innerText = "VERDICT: SUSPECT GEOMETRY (AI?)";
-            scoreDisplay.style.color = "#ef4444"; // Red
+            statusDiv.innerText = "Target: Your Nose";
+            statusDiv.classList.remove('success');
         }
     } else {
-        scoreDisplay.innerText = "--%";
-        statusText.innerText = "NO FACE DETECTED";
+        statusDiv.innerText = "Show your face and hand";
     }
+}
+
+// 4. Integrated Camera Loop
+const camera = new Camera(videoElement, {
+    onFrame: async () => {
+        // Process both in the same frame
+        await faceMesh.send({image: videoElement});
+        await hands.send({image: videoElement});
+        checkProximity();
+    },
+    width: 640,
+    height: 480
 });
 
-// 4. Start Camera
-const camera = new Camera(videoElement, {
-    onFrame: async () => await faceMesh.send({image: videoElement}),
-    width: 1280, height: 720
-});
 camera.start();

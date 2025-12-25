@@ -2,29 +2,19 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Forensic Symmetry Live</title>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+    <title>ESM Nose Touch</title>
     <style>
-        body { background: #0f172a; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; margin: 0; padding: 20px; }
-        .vid-container { position: relative; border-radius: 20px; overflow: hidden; border: 4px solid #334155; }
-        #video-input { transform: scaleX(-1); width: 800px; height: auto; }
-        .stats { margin-top: 20px; background: #1e293b; padding: 20px; border-radius: 15px; width: 400px; text-align: center; }
-        #score-display { font-size: 3.5rem; font-weight: 900; color: #22c55e; }
-        .verdict { margin-top: 10px; font-weight: bold; letter-spacing: 1px; }
+        body { background: #0f172a; color: white; font-family: sans-serif; text-align: center; }
+        #status { font-size: 4rem; font-weight: 800; margin: 20px; height: 100px; transition: 0.3s; }
+        .success { color: #facc15; text-shadow: 0 0 20px rgba(250, 204, 21, 0.5); transform: scale(1.1); }
+        video { transform: scaleX(-1); border-radius: 20px; border: 4px solid #334155; max-width: 90%; }
     </style>
 </head>
 <body>
-<h1>SYMMETRY ANALYZER</h1>
-<div class="vid-container">
-    <video id="video-input" autoplay></video>
-</div>
+<h1>FORENSIC TEST: TOUCH YOUR NOSE</h1>
+<div id="status">Waiting for camera...</div>
+<video id="input_video" autoplay></video>
 
-<div class="stats">
-    <div id="score-display">--%</div>
-    <div class="verdict" id="status-text">WAITING FOR FACE...</div>
-</div>
-
-<script src="bundle.js"></script>
+<script type="module" src="bundle.js"></script>
 </body>
 </html>
