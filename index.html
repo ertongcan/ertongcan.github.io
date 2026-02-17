@@ -1,76 +1,113 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1433248445674721"
-            crossorigin="anonymous"></script>
-    <title>Reach the Target</title>
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0288d1">
-    <link rel="stylesheet" href="style.css">
-
+    <title>Target Tap - Minimalist Casual Game</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --text-color: #212529;
+            --accent-color: #007bff;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+        }
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            letter-spacing: -1px;
+        }
+        p.tagline {
+            font-size: 1.25rem;
+            color: #6c757d;
+            margin-bottom: 2rem;
+        }
+        .features {
+            text-align: left;
+            margin-bottom: 2rem;
+            display: inline-block;
+        }
+        .features li {
+            list-style: none;
+            margin: 10px 0;
+            font-size: 1.1rem;
+        }
+        .features li::before {
+            content: "✓";
+            color: var(--accent-color);
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        .cta {
+            margin-top: 30px;
+        }
+        .play-store-badge {
+            width: 200px;
+            transition: transform 0.2s;
+        }
+        .play-store-badge:hover {
+            transform: scale(1.05);
+        }
+        footer {
+            margin-top: 50px;
+            font-size: 0.9rem;
+            color: #adb5bd;
+        }
+        footer a {
+            color: #adb5bd;
+            text-decoration: underline;
+            margin: 0 10px;
+        }
+    </style>
 </head>
 <body>
-<div class="game-container">
-    <header class="game-header">
+
+    <div class="container">
         <h1>Target Tap</h1>
-    </header>
-    <div class="level-row">
-        <span class="level-label">Score</span>
-        <span id="score" class="level-number">0</span>
-    </div>
-    <!-- Game UI wrapper -->
-    <div id="game-ui">
-        <!-- Target & Current -->
-        <div class="status status-center">
-            <div class="status-item target-item">
-                <span class="label">Target</span>
-                <span id="target-number" class="number target-number">0</span>
-            </div>
-            <div class="status-item current-item">
-                <span class="label">Current</span>
-                <span id="current-number" class="number current-number">0</span>
-            </div>
-        </div>
+        <p class="tagline">Think fast. React faster. Reach the target.</p>
 
-        <!-- Moves & Score -->
-        <div class="status status-secondary">
-            <div class="status-item">
-                <span class="label">Remaining Taps </span>
-                <span id="moves-left">0</span>
-            </div>
-            <button id="watch-ad-btn" class="watch-ad-btn">+ More Taps</button>
-            <div id="adsense-container"></div>
-        </div>
+        <p>A minimalist casual game where every move counts. Simple mechanics with endless depth for short, satisfying sessions.</p>
 
-        <!-- Operation buttons -->
-        <div class="buttons" id="operation-buttons">
-            <button id="left-btn"></button>
-            <button id="right-btn"></button>
-        </div>
-        <!-- All Time High below buttons -->
-        <div class="level-bar">
-            <span class="level-label">Highest Score</span>
-            <span id="high-score" class="level-value">0</span>
+        <ul class="features">
+            <li>Endless challenge with increasing difficulty - In Progress</li>
+            <li>Clean, minimalist visual design</li>
+            <li>Smooth pacing and quick decisions</li>
+            <li>No complicated menus—just play</li>
+        </ul>
+
+        <div class="cta">
+            <a href="https://play.google.com/store/apps/details?id=com.ertong.targetap" target="_blank">
+                <img class="play-store-badge" 
+                     alt="Get it on Google Play" 
+                     src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png"/>
+            </a>
         </div>
     </div>
 
-    <!-- Feedback -->
-    <div id="feedback" class="feedback"></div>
-
-    <!-- Retry button -->
-    <button id="retry-btn" class="retry-btn" style="display:none;">New Game</button>
-    <button id="cnt-btn" class="cnt-btn" style="display:none;">Continue</button>
-    <button id="watch-ad-continue" class="watch-ad-minimal" style="display:none;">
-        Watch Ad to Continue
-    </button>
-
-</div>
-
-
+    <footer>
+        <p>&copy; 2026 Target Tap</p>
+        <p>
+            <a href="mailto:targettapapp@gmail.com">Contact Support</a> | 
+            <a href="https://ertongcan.github.io/b6469541-0fc6-41f7-acee-a1730f35ad2d_en.html">Privacy Policy</a>
+        </p>
+    </footer>
 
 </body>
-<script type="module" src="bundle.js"></script>
 </html>
