@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0a0a0f">
+    <title>Rigging Tensor</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="glass-panel">
+            <div class="logo">
+                <div class="neon-dot"></div>
+                <h1>Rigging Tensor</h1>
+            </div>
+            <div class="status-indicator">
+                <button id="toggle-unit" class="btn secondary"
+                    style="margin: 0 16px 0 0; padding: 6px 12px; font-size: 0.75rem;">Switch to LBS</button>
+                <span id="sensor-status" class="status-dot"></span>
+                <span id="sensor-text">Sensors: INACTIVE</span>
+            </div>
+        </header>
+
+        <!-- Main Dashboard -->
+        <main class="dashboard">
+            <!-- Left Column: Controls -->
+            <section class="controls panel glass-panel">
+                <h2>Configuration</h2>
+
+                <div class="control-group">
+                    <label for="load-weight">Load Weight (<span class="unit-label">kg</span>)</label>
+                    <div class="range-wrapper">
+                        <input type="range" id="load-weight" min="10" max="5000" value="1000">
+                        <span class="value-display"><span id="load-val">1000</span> <span
+                                class="unit-label">kg</span></span>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label for="bridle-type">Bridle Type</label>
+                    <select id="bridle-type" class="dropdown-style">
+                        <option value="2">2-Point Bridle</option>
+                        <option value="3">3-Point Bridle</option>
+                        <option value="4">4-Point Bridle</option>
+                    </select>
+                </div>
+
+                <div class="control-group active-leg" id="leg-1-ctrl">
+                    <label for="angle-1">Leg 1 Angle (&deg; from vertical)</label>
+                    <div class="range-wrapper">
+                        <input type="range" id="angle-1" min="0" max="89" value="30">
+                        <span class="value-display"><span id="a1-val">30</span>&deg;</span>
+                    </div>
+                </div>
+
+                <div class="control-group active-leg" id="leg-2-ctrl">
+                    <label for="angle-2">Leg 2 Angle (&deg; from vertical)</label>
+                    <div class="range-wrapper">
+                        <input type="range" id="angle-2" min="0" max="89" value="30">
+                        <span class="value-display"><span id="a2-val">30</span>&deg;</span>
+                    </div>
+                </div>
+
+                <div class="control-group hidden-leg" id="leg-3-ctrl" style="display: none;">
+                    <label for="angle-3">Leg 3 Angle (&deg; from vertical)</label>
+                    <div class="range-wrapper">
+                        <input type="range" id="angle-3" min="0" max="89" value="30">
+                        <span class="value-display"><span id="a3-val">30</span>&deg;</span>
+                    </div>
+                </div>
+
+                <div class="control-group hidden-leg" id="leg-4-ctrl" style="display: none;">
+                    <label for="angle-4">Leg 4 Angle (&deg; from vertical)</label>
+                    <div class="range-wrapper">
+                        <input type="range" id="angle-4" min="0" max="89" value="30">
+                        <span class="value-display"><span id="a4-val">30</span>&deg;</span>
+                    </div>
+                </div>
+
+                <div class="toggles">
+                    <button id="toggle-sim" class="btn primary">Simulate Live Load</button>
+                    <div class="device-toggles" id="device-btn-container"
+                        style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;">
+                        <button id="btn-device-1" class="btn secondary"
+                            style="margin-top: 0; flex: 1; padding: 12px 6px;">📱 L1</button>
+                        <button id="btn-device-2" class="btn secondary"
+                            style="margin-top: 0; flex: 1; padding: 12px 6px;">📱 L2</button>
+                        <button id="btn-device-3" class="btn secondary"
+                            style="margin-top: 0; flex: 1; padding: 12px 6px; display: none;">📱 L3</button>
+                        <button id="btn-device-4" class="btn secondary"
+                            style="margin-top: 0; flex: 1; padding: 12px 6px; display: none;">📱 L4</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Center Column: Visualization -->
+            <section class="visualization panel glass-panel">
+                <div class="canvas-wrapper">
+                    <canvas id="vector-canvas"></canvas>
+                    <div class="overlay-stats">
+                        <div class="stat-pill accent-left" id="t1-pill">
+                            <span class="label">L1 Tension</span>
+                            <span class="val" id="t1-display">0.0 <span class="unit-label">kg</span></span>
+                        </div>
+                        <div class="stat-pill accent-right" id="t2-pill">
+                            <span class="label">L2 Tension</span>
+                            <span class="val" id="t2-display">0.0 <span class="unit-label">kg</span></span>
+                        </div>
+                        <div class="stat-pill" id="t3-pill" style="display: none; border-color: #ffb800;">
+                            <span class="label">L3 Tension</span>
+                            <span class="val" id="t3-display" style="color: #ffb800;">0.0 <span
+                                    class="unit-label">kg</span></span>
+                        </div>
+                        <div class="stat-pill" id="t4-pill" style="display: none; border-color: #b000ff;">
+                            <span class="label">L4 Tension</span>
+                            <span class="val" id="t4-display" style="color: #b000ff;">0.0 <span
+                                    class="unit-label">kg</span></span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Column: Telemetry -->
+            <section class="telemetry panel glass-panel">
+                <h2>Real-Time Telemetry</h2>
+
+                <div class="data-stream">
+                    <div class="data-row">
+                        <span class="data-label">Current Load (W)</span>
+                        <span class="data-value tech-font" id="live-load">1000.00</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">L1 Force</span>
+                        <span class="data-value tech-font" id="live-t1">577.35</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">L2 Force</span>
+                        <span class="data-value tech-font" id="live-t2">577.35</span>
+                    </div>
+                    <div class="data-row" id="row-t3" style="display: none;">
+                        <span class="data-label">L3 Force</span>
+                        <span class="data-value tech-font" id="live-t3">0.00</span>
+                    </div>
+                    <div class="data-row" id="row-t4" style="display: none;">
+                        <span class="data-label">L4 Force</span>
+                        <span class="data-value tech-font" id="live-t4">0.00</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Safety Factor</span>
+                        <span class="data-value tech-font" id="safety-factor">5.0</span>
+                    </div>
+
+                    <div class="vector-log">
+                        <div class="log-header">Force Vector Logs</div>
+                        <ul id="log-list">
+                            <li>Initializing telemetry...</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
