@@ -28,7 +28,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-image: 
+    background-image:
         radial-gradient(circle at 15% 50%, rgba(112, 0, 255, 0.15), transparent 25%),
         radial-gradient(circle at 85% 30%, rgba(0, 240, 255, 0.1), transparent 25%);
 }
@@ -111,7 +111,8 @@ h1 {
     grid-template-columns: 300px 1fr 300px;
     gap: 20px;
     flex-grow: 1;
-    min-height: 0; /* Important for flex child scrolling */
+    min-height: 0;
+    /* Important for flex child scrolling */
 }
 
 @media (max-width: 1024px) {
@@ -121,18 +122,27 @@ h1 {
         overflow-y: visible;
         gap: 12px;
     }
+
     .app-container {
         height: auto;
         min-height: 100vh;
         overflow-y: visible;
         padding: 12px;
     }
+
     body {
         overflow-y: auto;
+        height: auto;
+        min-height: 100vh;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
     }
+
     header {
         padding: 12px 16px;
     }
+
     h1 {
         font-size: 1.2rem;
     }
@@ -149,7 +159,7 @@ h2 {
     font-size: 1.1rem;
     font-weight: 600;
     color: #fff;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     padding-bottom: 12px;
     margin-bottom: 8px;
 }
@@ -174,7 +184,7 @@ label {
 input[type="range"] {
     flex-grow: 1;
     -webkit-appearance: none;
-    background: rgba(255,255,255,0.1);
+    background: rgba(255, 255, 255, 0.1);
     height: 4px;
     border-radius: 2px;
     outline: none;
@@ -222,7 +232,8 @@ input[type="range"]::-webkit-slider-thumb:hover {
     border: 1px solid var(--accent-primary);
 }
 
-.btn.primary:hover, .btn.primary.active {
+.btn.primary:hover,
+.btn.primary.active {
     background: var(--accent-primary);
     color: #000;
     box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
@@ -235,7 +246,8 @@ input[type="range"]::-webkit-slider-thumb:hover {
     margin-top: 12px;
 }
 
-.btn.secondary:hover, .btn.secondary.active {
+.btn.secondary:hover,
+.btn.secondary.active {
     background: var(--accent-secondary);
     color: #fff;
     box-shadow: 0 0 15px rgba(255, 0, 85, 0.4);
@@ -258,8 +270,8 @@ input[type="range"]::-webkit-slider-thumb:hover {
     flex-grow: 1;
     position: relative;
     border-radius: 12px;
-    background: radial-gradient(circle at center, rgba(255,255,255,0.03) 0%, transparent 70%);
-    border: 1px dashed rgba(255,255,255,0.1);
+    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.03) 0%, transparent 70%);
+    border: 1px dashed rgba(255, 255, 255, 0.1);
     overflow: hidden;
 }
 
@@ -282,7 +294,7 @@ canvas {
 .stat-pill {
     background: rgba(10, 10, 15, 0.8);
     backdrop-filter: blur(4px);
-    border: 1px solid rgba(255,255,255,0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     padding: 8px 16px;
     border-radius: 20px;
     display: flex;
@@ -302,8 +314,13 @@ canvas {
     font-weight: 700;
 }
 
-.accent-left .val { color: var(--accent-primary); }
-.accent-right .val { color: var(--accent-secondary); }
+.accent-left .val {
+    color: var(--accent-primary);
+}
+
+.accent-right .val {
+    color: var(--accent-secondary);
+}
 
 .data-stream {
     display: flex;
@@ -315,7 +332,7 @@ canvas {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     padding-bottom: 8px;
 }
 
@@ -330,14 +347,22 @@ canvas {
     font-size: 1.1rem;
 }
 
-#safety-factor.safe { color: var(--success); }
-#safety-factor.warn { color: var(--warning); }
-#safety-factor.danger { color: var(--accent-secondary); }
+#safety-factor.safe {
+    color: var(--success);
+}
+
+#safety-factor.warn {
+    color: var(--warning);
+}
+
+#safety-factor.danger {
+    color: var(--accent-secondary);
+}
 
 .vector-log {
     margin-top: 16px;
-    background: rgba(0,0,0,0.3);
-    border: 1px solid rgba(255,255,255,0.05);
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 8px;
     height: 150px;
     display: flex;
@@ -346,12 +371,12 @@ canvas {
 }
 
 .log-header {
-    background: rgba(255,255,255,0.05);
+    background: rgba(255, 255, 255, 0.05);
     padding: 8px 12px;
     font-size: 0.75rem;
     text-transform: uppercase;
     color: var(--text-secondary);
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 #log-list {
