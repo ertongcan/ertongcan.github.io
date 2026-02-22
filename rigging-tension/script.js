@@ -15,7 +15,7 @@ let telemetry = {
 };
 
 let simActive = false;
-let deviceAngleActive = false;
+let activeDeviceLeg = 0; // 0=none, 1=leg1, 2=leg2
 let time = 0;
 
 // DOM Elements
@@ -35,7 +35,8 @@ const els = {
     t2Display: document.getElementById('t2-display'),
 
     btnSim: document.getElementById('toggle-sim'),
-    btnDevice: document.getElementById('toggle-device'),
+    btnDevice1: document.getElementById('btn-device-1'),
+    btnDevice2: document.getElementById('btn-device-2'),
     sensorStatus: document.getElementById('sensor-status'),
     sensorText: document.getElementById('sensor-text'),
     logList: document.getElementById('log-list'),
@@ -52,7 +53,8 @@ function init() {
     els.a2In.addEventListener('input', (e) => { config.angle2 = parseFloat(e.target.value); updateUI(); });
 
     els.btnSim.addEventListener('click', toggleSim);
-    els.btnDevice.addEventListener('click', toggleDeviceAngle);
+    els.btnDevice1.addEventListener('click', () => toggleDeviceAngle(1));
+    els.btnDevice2.addEventListener('click', () => toggleDeviceAngle(2));
 
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
@@ -62,10 +64,8 @@ function init() {
 
 function updateUI() {
     if (!simActive) telemetry.liveLoad = config.load;
-    if (!deviceAngleActive) {
-        telemetry.liveAngle1 = config.angle1;
-        telemetry.liveAngle2 = config.angle2;
-    }
+    if (activeDeviceLeg !== 1) telemetry.liveAngle1 = config.angle1;
+    if (activeDeviceLeg !== 2) telemetry.liveAngle2 = config.angle2;
 
     els.loadVal.textContent = config.load.toFixed(0);
     els.a1Val.textContent = config.angle1.toFixed(0);
@@ -79,54 +79,72 @@ function toggleSim() {
     log(`Load simulation ${simActive ? 'started' : 'stopped'}`);
 }
 
-function toggleDeviceAngle() {
+function toggleDeviceAngle(leg) {
+    if (activeDeviceLeg === leg) {
+        activeDeviceLeg = 0;
+        updateDeviceButtons();
+        window.removeEventListener('deviceorientation', handleOrientation);
+        updateSensorStatus();
+        log(`Device tracking disabled`);
+        return;
+    }
+
     if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-        DeviceOrientationEvent.requestPermission()
-            .then(permissionState => {
-                if (permissionState === 'granted') {
-                    activateDeviceOrientation();
-                } else {
-                    log("Device orientation permission denied");
-                }
-            })
-            .catch(console.error);
+        if (activeDeviceLeg === 0) {
+            DeviceOrientationEvent.requestPermission()
+                .then(permissionState => {
+                    if (permissionState === 'granted') {
+                        activateDeviceLeg(leg);
+                    } else {
+                        log("Device orientation permission denied");
+                    }
+                })
+                .catch(console.error);
+        } else {
+            activateDeviceLeg(leg);
+        }
     } else {
-        // Non iOS 13+ devices
-        activateDeviceOrientation();
+        activateDeviceLeg(leg);
     }
 }
 
-function activateDeviceOrientation() {
-    deviceAngleActive = !deviceAngleActive;
-    els.btnDevice.classList.toggle('active', deviceAngleActive);
+function activateDeviceLeg(leg) {
+    const wasActive = activeDeviceLeg !== 0;
+    activeDeviceLeg = leg;
+    updateDeviceButtons();
     updateSensorStatus();
-    log(`Device orientation ${deviceAngleActive ? 'enabled' : 'disabled'}`);
+    log(`Tracking Leg ${leg} angle`);
 
-    if (deviceAngleActive) {
+    if (!wasActive) {
         window.addEventListener('deviceorientation', handleOrientation);
-    } else {
-        window.removeEventListener('deviceorientation', handleOrientation);
-        telemetry.liveAngle1 = config.angle1; // Reset
     }
+}
+
+function updateDeviceButtons() {
+    els.btnDevice1.classList.toggle('active', activeDeviceLeg === 1);
+    els.btnDevice2.classList.toggle('active', activeDeviceLeg === 2);
 }
 
 function handleOrientation(event) {
-    if (!deviceAngleActive) return;
-    // Use gamma (left/right tilt) or beta (front/back)
-    // Map -90 to 90 to an angle 0 to 89
-    let tilt = event.gamma || 0; // -90 to 90
+    if (activeDeviceLeg === 0) return;
+    let tilt = event.gamma || 0;
     let adjustedAngle = Math.abs(tilt);
     if (adjustedAngle > 89) adjustedAngle = 89;
-    telemetry.liveAngle1 = adjustedAngle;
 
-    // Update the slider to reflect
-    config.angle1 = adjustedAngle;
-    els.a1In.value = adjustedAngle;
+    if (activeDeviceLeg === 1) {
+        telemetry.liveAngle1 = adjustedAngle;
+        config.angle1 = adjustedAngle;
+        els.a1In.value = adjustedAngle;
+    } else if (activeDeviceLeg === 2) {
+        telemetry.liveAngle2 = adjustedAngle;
+        config.angle2 = adjustedAngle;
+        els.a2In.value = adjustedAngle;
+    }
     updateUI();
 }
 
 function updateSensorStatus() {
-    const active = simActive || deviceAngleActive;
+    const active = simActive || activeDeviceLeg !== 0;
     els.sensorStatus.classList.toggle('active', active);
     els.sensorText.textContent = `Sensors: ${active ? 'ACTIVE' : 'INACTIVE'}`;
 }
